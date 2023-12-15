@@ -1,0 +1,36 @@
+{
+  "name": "electron-windows-msix",
+  "version": "1.0.0",
+  "description": "MSIX packager for Electron Apps",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "tsc",
+    "test": "tsc & node ./test/testing.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitdisaster/electron-windows-msix.git"
+  },
+  "keywords": [
+    "MSIX",
+    "packager",
+    "Electron",
+    "installer"
+  ],
+  "author": "Jan Hannemann",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bitdisaster/electron-windows-msix/issues"
+  },
+  "homepage": "https://github.com/bitdisaster/electron-windows-msix#readme",
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "fs-extra": "^11.2.0"
+  }
+}

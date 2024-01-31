@@ -1,3 +1,4 @@
-/src
-/test
-/out
+node_modules/
+src/
+test/
+out/

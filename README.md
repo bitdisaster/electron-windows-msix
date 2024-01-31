@@ -68,4 +68,5 @@ packageMSIX({
 ```
 
 ----
-### [MIT License (MIT)](LICENSE) | Copyright (c) Jan Hannemann.
+#### [MIT License (MIT)](LICENSE) | Copyright (c) Jan Hannemann.
+----

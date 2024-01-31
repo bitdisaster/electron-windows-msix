@@ -28,15 +28,15 @@ export interface PackagingOptions {
    * An optional path to the certificate. If not provided then the MSIX will not be signed. Beware that the Publisher of the cert
    * must match the AppxManifest Publisher.
    */
-  cert: string,
+  cert: string;
   /**
    * The password for the cert.
    */
-  cert_pass?: string,
+  cert_pass?: string;
   /**
    * Controls the level of logging
    */
-  logLevel: 'warn' | 'debug' | undefined,
+  logLevel: 'warn' | 'debug' | undefined;
 }
 
 export interface ProgramOptions {

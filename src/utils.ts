@@ -2,7 +2,8 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import { log } from "./logger";
-import { PackagingOptions, ProgramOptions } from "./types";
+import { ManifestVariables, PackagingOptions, ProgramOptions } from "./types";
+import { getCertPublisher } from './msix';
 
 const WIN_KIT_BIN_PATH = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin';
 const MAKE_PRI_EXE = 'makepri.exe';
@@ -39,18 +40,18 @@ const ensureFolders = async (options: PackagingOptions) => {
 
   return { outputDir, layoutDir };
 }
-
-let manifestVariables = undefined;
-const getManifestVariables = async (options: PackagingOptions) => {
-  if(manifestVariables) return manifestVariables;
-
+export const getManifestVariables = async (options: PackagingOptions) : Promise<ManifestVariables> => {
   const manifestXml = (await fs.readFile(options.appManifest)).toString();
   const minWinVersionRegEx = /MinVersion="(.*?)"/s;
   const appNameRegEx = /<DisplayName>(.*?)<\/DisplayName>/s;
   const archRegEx = /ProcessorArchitecture="(.*?)"/s;
-  let osMinVersion;
-  let appName;
-  let packageArch;
+  const sparseRegex = /<uap10:AllowExternalContent>\s*true\s*<\/uap10:AllowExternalContent>/s;
+  const publisherRegex = /Publisher="(.*?)"/s
+  let osMinVersion: string;
+  let appName: string;
+  let packageArch: string;
+  let isSparsePackage = false;
+  let publisher: string
 
   let match = manifestXml.match(minWinVersionRegEx);
   if (match) {
@@ -67,27 +68,42 @@ const getManifestVariables = async (options: PackagingOptions) => {
     packageArch = match[1];
   }
 
-  manifestVariables = {
+  match = manifestXml.match(sparseRegex);
+  if (match) {
+    isSparsePackage = true;
+  }
+
+  match = manifestXml.match(publisherRegex);
+  if (match) {
+    publisher = match[1];
+  }
+
+  const manifestVariables : ManifestVariables = {
     osMinVersion,
     appName,
     packageArch,
+    isSparsePackage,
+    publisher
   }
 
   return manifestVariables;
 }
 
 
-export const verifyOptions = async (options: PackagingOptions) => {
+export const verifyOptions = async (options: PackagingOptions, manifestVars: ManifestVariables) => {
+  const { isSparsePackage, publisher } = manifestVars;
   log.debug('You are calling with following packaging options', options)
-  if(!options.appDir) log.error('Path to application <appDir> not provided.', true);
-  if(!(await fs.exists(options.appDir))) log.error('Path to application <appDir> does not exist.', true, { appDir: options.appDir });
   if(!options.appManifest) log.error('Path to application manifest <appManifest> not provided.', true);
   if(!(await fs.exists(options.appManifest))) log.error('Path to application manifest <appManifest> does not exist.', true, { appManifest: options.appManifest });
+  if(!options.appDir && !isSparsePackage) log.error('Path to application <appDir> not provided.', true);
+  if(!(await fs.exists(options.appDir)) && !isSparsePackage) log.error('Path to application <appDir> does not exist.', true, { appDir: options.appDir });
   if(!options.packageAssets) log.error('Path to packages assets <packageAssets> not provided.', true);
   if(!(await fs.exists(options.appManifest))) log.error('Path to packages assets <packageAssets> does not exist.', true, { packageAssets: options.packageAssets });
   if(!options.cert) log.warn('Path to cert <cert> not provided. Package will not be signed!');
   if(options.cert && !(await fs.exists(options.cert))) log.error('Path to cert <cert> does not exist.', true, { cert: options.cert });
   if(options.cert && !options.cert_pass) log.warn('Cert cert password <cert_pass> not provided.');
+  const certPublisher = await getCertPublisher(options.cert, options.cert_pass);
+  if(publisher != certPublisher) log.error('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: publisher, cert_publisher: certPublisher});
 }
 
 export const setLogLevel = (options: PackagingOptions) => {
@@ -96,7 +112,7 @@ export const setLogLevel = (options: PackagingOptions) => {
   globalThis.DEBUG = logLevel === 'debug';
 }
 
-export const locateMSIXTooling = async (options: PackagingOptions) => {
+export const locateMSIXTooling = async (options: PackagingOptions, manifestVars: ManifestVariables) => {
   const { appManifest, windowsKitVersion, windowsKitPath } = options;
   if(windowsKitPath) {
     log.debug('WindowsKitPath was provided and takes priority over WindowsKitVersion. Checking if it exists....', {windowsKitPath});
@@ -127,7 +143,7 @@ export const locateMSIXTooling = async (options: PackagingOptions) => {
   }
 
   if(appManifest) {
-    const { osMinVersion } = await getManifestVariables(options);
+    const { osMinVersion } = manifestVars;
     if (osMinVersion) {
       const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, osMinVersion, process.arch == 'ia32' ? 'x86' : process.arch);
 
@@ -145,12 +161,11 @@ export const locateMSIXTooling = async (options: PackagingOptions) => {
   log.error('Unable to locate MSIX Tooling. Giving up!', true);
 }
 
-export const makeProgramOptions = async (options: PackagingOptions) => {
-  manifestVariables = undefined;
-  const { makeAppx, makePri, signTool } = await locateMSIXTooling(options);
+export const makeProgramOptions = async (options: PackagingOptions, manifestVars: ManifestVariables) => {
+  const { makeAppx, makePri, signTool } = await locateMSIXTooling(options, manifestVars);
   const { outputDir, layoutDir } = await ensureFolders(options);
-  const { appName, packageArch } = await getManifestVariables(options);
-  const msiPackageName = options.packageName || `${appName}_${packageArch}.msix`;
+  const { appName, packageArch, isSparsePackage } = manifestVars;
+  const msiPackageName = options.packageName || packageArch ? `${appName}_${packageArch}.msix` : `${appName}.msix`;
   const msix = path.join(outputDir, msiPackageName);
   const appManifestLayout = path.join(layoutDir, `AppxManifest.xml`);
   const assetsLayout = path.join(layoutDir, `assets`);
@@ -177,6 +192,7 @@ export const makeProgramOptions = async (options: PackagingOptions) => {
     priConfig,
     priFile,
     createPri,
+    isSparsePackage,
   }
 
   log.debug('Program options', program);
@@ -186,5 +202,7 @@ export const makeProgramOptions = async (options: PackagingOptions) => {
 export const createLayout = async (program: ProgramOptions) => {
   await fs.copyFile(program.appManifestIn, program.appManifestLayout);
   await fs.copy(program.assetsIn, program.assetsLayout);
-  await fs.copy(program.appDir, program.appLayout);
+  if(!program.isSparsePackage) {
+    await fs.copy(program.appDir, program.appLayout);
+  }
 }

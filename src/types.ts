@@ -1,8 +1,8 @@
 export interface PackagingOptions {
   /**
-   * The folder containing the packaged Electron App
+   * The folder containing the packaged Electron App. This parameter is required unless its building a Sparse MSIX.
    */
-  appDir: string;
+  appDir?: string;
   /**
    * The AppManifest.xml containing necessary declarations to build the MSIX
    */
@@ -36,7 +36,7 @@ export interface PackagingOptions {
   /**
    * Controls the level of logging
    */
-  logLevel: 'warn' | 'debug' | undefined;
+  logLevel?: 'warn' | 'debug';
 }
 
 export interface ProgramOptions {
@@ -57,4 +57,14 @@ export interface ProgramOptions {
   createPri: boolean;
   priConfig: string;
   priFile: string;
+  isSparsePackage: boolean;
+}
+
+
+export type ManifestVariables = {
+  osMinVersion: string,
+  appName: string,
+  packageArch: string,
+  isSparsePackage: boolean,
+  publisher: string
 }

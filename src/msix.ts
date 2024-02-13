@@ -2,7 +2,7 @@ import { log } from "./logger"
 import { ProgramOptions } from "./types";
 
 const  run = async (executable: string, args: Array<string>)  => {
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     const proc = require('child_process').spawn(executable, args, {});
     log.debug(`Calling ${executable} with args`, args);
 
@@ -11,30 +11,42 @@ const  run = async (executable: string, args: Array<string>)  => {
       .toString()
       .replace(/\r/g, '')
       .replace(/\\\\/g, '\\')
-      .split('\n');
+      .split('\n')
     }
 
-    let stdout = [];
+    let stdout = "";
     proc.stdout.on('data', (data) => {
-      stdout.push(...cleanOutData(data));
+      stdout += data;
     });
 
-    let stderr = [];
+    let stderr = "";
     proc.stderr.on('data', (data) => {
-      stderr.push(...cleanOutData(data));
+      stderr += data;
     });
 
     proc.on('exit', (code) => {
-      log.debug(`stdout of ${executable}`, stdout);
+      log.debug(`stdout of ${executable}`, cleanOutData(stdout));
       if (code !== 0) {
-        log.error(`stderr of ${executable}`, false, stderr)
+        log.error(`stderr of ${executable}`, false, cleanOutData(stderr))
         return reject(new Error(`Failed running ${executable} Exit Code: ${code} See previous errors for details`))
       }
-      return resolve();
+      return resolve(stdout);
     });
 
     proc.stdin.end();
   })
+}
+
+export const getCertPublisher = async (cert: string, cert_pass: string) => {
+  const args = [ '-p', cert_pass, '-dump', cert];
+  const certDump = await run('certutil', args);
+  const subjectRegex = /Subject:\s*(.*)/;
+  const match = certDump.match(subjectRegex);
+  const publisher = match ? match[1].trim() : null;
+  if(!publisher) {
+    log.error('Unable to find publisher in Cert');
+  }
+  return publisher;
 }
 
 export const priConfig = async (program: ProgramOptions) => {
@@ -60,7 +72,7 @@ export const pri = async (program: ProgramOptions) => {
 }
 
 export const make = async (program: ProgramOptions) => {
-  const { makeMsix, layoutDir, msix} = program;
+  const { makeMsix, layoutDir, msix, isSparsePackage} = program;
   const args = [
     'pack',
     '/d',
@@ -69,6 +81,11 @@ export const make = async (program: ProgramOptions) => {
     msix,
     '/o',
   ];
+
+  if(isSparsePackage) {
+    args.push('/nv');
+  }
+
 
   await run(makeMsix, args);
 }

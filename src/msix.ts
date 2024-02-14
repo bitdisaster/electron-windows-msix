@@ -38,7 +38,11 @@ const  run = async (executable: string, args: Array<string>)  => {
 }
 
 export const getCertPublisher = async (cert: string, cert_pass: string) => {
-  const args = [ '-p', cert_pass, '-dump', cert];
+  const args = [];
+  if(cert_pass) {
+    args.push('-p', cert_pass);
+  }
+  args.push('-dump', cert);
   const certDump = await run('certutil', args);
   const subjectRegex = /Subject:\s*(.*)/;
   const match = certDump.match(subjectRegex);

@@ -4,7 +4,9 @@ import * as path from 'path';
 import { log } from "./logger";
 import { ManifestVariables, PackagingOptions, ProgramOptions } from "./types";
 import { getCertPublisher } from './msix';
+import { WindowsVersion } from './win-version';
 
+const MIN_ARM_WIN_KIT_VERSION = '10.0.22621.0';
 const WIN_KIT_BIN_PATH = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin';
 const MAKE_PRI_EXE = 'makepri.exe';
 const MAKE_APPX_EXE = 'makeappx.exe';
@@ -127,10 +129,15 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars:
     log.debug('No WindowsKitPath provided. Will try WindowsKitVersion next.');
   }
 
+  let arch = process.arch === 'ia32' ? 'x86' : process.arch
   if(windowsKitVersion) {
+    // Older versions than WinKit 10.0.22621.0 for ARM are missing the makeAppx.exe and we will fall back to x64 in that case.
+    if(WindowsVersion.IsOlder(windowsKitVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
+      arch = 'x64';
+    }
     log.debug('WindowsKitVersion was provided and takes priority over AppxManifest. Checking if it exists....', {windowsKitVersion});
-
-    const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, windowsKitVersion, process.arch == 'ia32' ? 'x86' : process.arch);
+    const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, windowsKitVersion, arch);
+    
     if(await fs.pathExists(windowsKitPathExec)) {
       const binaries = await getBinaries(windowsKitPathExec);
       log.debug(`WindowsKit version ${windowsKitVersion} exists. Getting binary paths.`, binaries);
@@ -145,7 +152,12 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars:
   if(appManifest) {
     const { osMinVersion } = manifestVars;
     if (osMinVersion) {
-      const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, osMinVersion, process.arch == 'ia32' ? 'x86' : process.arch);
+      // Older versions than WinKit 10.0.22621.0 for ARM are missing the makeAppx.exe and we will fall back to x64 in that case.
+      if(WindowsVersion.IsOlder(osMinVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
+        arch = 'x64';
+      }
+      log.debug('WindowsKitVersion was derived from OSMiversion of the AppxManifest. Checking if it exists....', {windowsKitVersion});
+      const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, osMinVersion, arch);
 
       if(await fs.pathExists(windowsKitPathExec)) {
         const binaries = await getBinaries(windowsKitPathExec);

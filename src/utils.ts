@@ -104,8 +104,10 @@ export const verifyOptions = async (options: PackagingOptions, manifestVars: Man
   if(!options.cert) log.warn('Path to cert <cert> not provided. Package will not be signed!');
   if(options.cert && !(await fs.exists(options.cert))) log.error('Path to cert <cert> does not exist.', true, { cert: options.cert });
   if(options.cert && !options.cert_pass) log.warn('Cert cert password <cert_pass> not provided.');
-  const certPublisher = await getCertPublisher(options.cert, options.cert_pass);
-  if(publisher != certPublisher) log.error('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: publisher, cert_publisher: certPublisher});
+  if(options.cert) {
+    const certPublisher = await getCertPublisher(options.cert, options.cert_pass);
+    if(publisher != certPublisher) log.error('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: publisher, cert_publisher: certPublisher});
+  }
 }
 
 export const setLogLevel = (options: PackagingOptions) => {
@@ -185,6 +187,7 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
   const priConfig = path.join(layoutDir, 'priconfig.xml');
   const priFile =  path.join(layoutDir, 'resources.pri');
   const createPri = options.createPri !== undefined ? options.createPri : true;
+  const sign = !!options.cert;
 
   const program: ProgramOptions = {
     makeMsix: makeAppx,
@@ -205,6 +208,7 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
     priFile,
     createPri,
     isSparsePackage,
+    sign,
   }
 
   log.debug('Program options', program);

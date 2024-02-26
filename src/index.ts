@@ -11,5 +11,7 @@ export const packageMSIX = async (options: PackagingOptions) => {
   await priConfig(program);
   await pri(program);
   await make(program);
-  await sign(program);
+  if(program.sign) {
+    await sign(program);
+  }
 }

@@ -28,7 +28,7 @@ export interface PackagingOptions {
    * An optional path to the certificate. If not provided then the MSIX will not be signed. Beware that the Publisher of the cert
    * must match the AppxManifest Publisher.
    */
-  cert: string;
+  cert?: string;
   /**
    * The password for the cert.
    */
@@ -58,6 +58,7 @@ export interface ProgramOptions {
   priConfig: string;
   priFile: string;
   isSparsePackage: boolean;
+  sign: boolean;
 }
 
 

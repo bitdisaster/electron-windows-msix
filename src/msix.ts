@@ -95,18 +95,8 @@ export const make = async (program: ProgramOptions) => {
 }
 
 export const sign = async (program: ProgramOptions) => {
-  const { signTool, cert, cert_pass, msix } = program;
-  const args = [
-    'sign',
-    '-fd',
-    'sha256',
-    '-f',
-    cert,
-  ];
-  if (cert_pass) {
-    args.push('-p', cert_pass);
-  }
+  const {signTool, signParams, msix } = program;
+  const args = signParams;
   args.push(msix);
-
   await run(signTool, args);
 }

@@ -34,6 +34,10 @@ export interface PackagingOptions {
    */
   cert_pass?: string;
   /**
+   * A custom set of SignTool parameters. If present it will supersede cert and cert_pass parameters.
+   */
+  signParams?: Array<string>
+  /**
    * Controls the level of logging
    */
   logLevel?: 'warn' | 'debug';
@@ -58,6 +62,7 @@ export interface ProgramOptions {
   priConfig: string;
   priFile: string;
   isSparsePackage: boolean;
+  signParams: Array<string>;
   sign: boolean;
 }
 

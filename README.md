@@ -36,6 +36,7 @@ Before running the Electron-Windows-Store CLI, let's make sure we have all the p
   cert              - An optional path to the certificate. If not provided then the MSIX will not be signed. Beware that the Publisher of the cert
                       must match the AppxManifest Publisher.
   cert_pass         - Optionally the password for the cert.
+  signParams        - Optionally an explicit set parameter for the SignTool. If present it will supersede the cert an cert_pass parameter.
   logLevel          - Optional log level. By default the module will be silent. The 'warn' level will give heads up on irregularities.
                       The 'debug' level will give extensive output to identify problems with the module.
 ```

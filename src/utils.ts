@@ -101,7 +101,8 @@ export const verifyOptions = async (options: PackagingOptions, manifestVars: Man
   if(!(await fs.exists(options.appDir)) && !isSparsePackage) log.error('Path to application <appDir> does not exist.', true, { appDir: options.appDir });
   if(!options.packageAssets) log.error('Path to packages assets <packageAssets> not provided.', true);
   if(!(await fs.exists(options.appManifest))) log.error('Path to packages assets <packageAssets> does not exist.', true, { packageAssets: options.packageAssets });
-  if(!options.cert) log.warn('Path to cert <cert> not provided. Package will not be signed!');
+  if(!options.cert && !options.signParams) log.warn('Path to cert <cert> and/or signParams not provided. Package will not be signed!');
+  if(options.cert && options.signParams) log.warn('Path to cert <cert> and signParams provided. signParams will take priority!');
   if(options.cert && !(await fs.exists(options.cert))) log.error('Path to cert <cert> does not exist.', true, { cert: options.cert });
   if(options.cert && !options.cert_pass) log.warn('Cert cert password <cert_pass> not provided.');
   if(options.cert) {
@@ -139,7 +140,7 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars:
     }
     log.debug('WindowsKitVersion was provided and takes priority over AppxManifest. Checking if it exists....', {windowsKitVersion});
     const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, windowsKitVersion, arch);
-    
+
     if(await fs.pathExists(windowsKitPathExec)) {
       const binaries = await getBinaries(windowsKitPathExec);
       log.debug(`WindowsKit version ${windowsKitVersion} exists. Getting binary paths.`, binaries);
@@ -187,7 +188,22 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
   const priConfig = path.join(layoutDir, 'priconfig.xml');
   const priFile =  path.join(layoutDir, 'resources.pri');
   const createPri = options.createPri !== undefined ? options.createPri : true;
-  const sign = !!options.cert;
+  let signParams: Array<string> = undefined;
+  if(options.signParams && options.signParams.length > 0) {
+    signParams = options.signParams;
+  } else if (options.cert) {
+    signParams = [
+      'sign',
+      '-fd',
+      'sha256',
+      '-f',
+      options.cert,
+    ];
+    if (options.cert_pass) {
+      signParams.push('-p', options.cert_pass);
+    }
+  }
+  const sign = !!signParams;
 
   const program: ProgramOptions = {
     makeMsix: makeAppx,
@@ -208,6 +224,7 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
     priFile,
     createPri,
     isSparsePackage,
+    signParams,
     sign,
   }
 

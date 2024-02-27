@@ -9,7 +9,23 @@ packageMSIX({
   outputDir: path.join(__dirname, '..\\out\\x64'),
   cert:  path.join(__dirname, '..\\test\\fixtures\\app_cert.pfx'),
   cert_pass: 'hellomsix',
-})
+});
+
+packageMSIX({
+  appDir:  path.join(__dirname, '..\\test\\fixtures\\app-x64'),
+  appManifest: path.join(__dirname, '..\\test\\fixtures\\AppxManifest_x64.xml'),
+  packageAssets: path.join(__dirname, '..\\test\\fixtures\\assets'),
+  outputDir: path.join(__dirname, '..\\out\\x64-signParams'),
+  signParams: [
+    'sign',
+    '-fd',
+    'sha256',
+    '-f',
+    path.join(__dirname, '..\\test\\fixtures\\app_cert.pfx'),
+    '-p',
+    'hellomsix',
+  ],
+});
 
 packageMSIX({
     appDir:  path.join(__dirname, '..\\test\\fixtures\\app-arm64'),
@@ -21,7 +37,7 @@ packageMSIX({
     cert:  path.join(__dirname, '..\\test\\fixtures\\app_cert.pfx'),
     cert_pass: 'hellomsix',
     logLevel: 'warn',
-})
+});
 
 packageMSIX({
   appManifest: path.join(__dirname, '..\\test\\fixtures\\AppxManifest_Sparse.xml'),

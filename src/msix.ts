@@ -96,7 +96,10 @@ export const make = async (program: ProgramOptions) => {
 
 export const sign = async (program: ProgramOptions) => {
   const {signTool, signParams, msix } = program;
-  const args = signParams;
-  args.push(msix);
+  const args = [
+    'sign',
+    ...signParams,
+    msix
+  ]
   await run(signTool, args);
 }

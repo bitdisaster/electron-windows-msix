@@ -193,7 +193,6 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
     signParams = options.signParams;
   } else if (options.cert) {
     signParams = [
-      'sign',
       '-fd',
       'sha256',
       '-f',

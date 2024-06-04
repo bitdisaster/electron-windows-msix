@@ -13,7 +13,7 @@ Electron-Windows-MSIX is a module that lets you create an MSIX installer from a 
 ### Installation
 
 ```
-npm install -g electron-windows-msix
+npm install electron-windows-msix
 ```
 
 This tool supports two methods to create AppX packages: Either using manual file copy operations, or using Windows Containers. The first option requires only the [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk),

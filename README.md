@@ -16,17 +16,13 @@ Electron-Windows-MSIX is a module that lets you create an MSIX installer from a 
 npm install electron-windows-msix
 ```
 
-This tool supports two methods to create AppX packages: Either using manual file copy operations, or using Windows Containers. The first option requires only the [Windows 10 SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk),
-
 ## Usage
-Before running the Electron-Windows-Store CLI, let's make sure we have all the prerequisites in place. You will need:
-
 ```
   PACKAGING OPTIONS
 
   appDir            - The folder containing the packaged Electron App
   appManifest       - The AppManifest.xml containing necessary declarations to build the MSIX
-  packageAssets     - Required assets declared in AppManifest.xml. E.g. icons and tile images */
+  packageAssets     - Required assets declared in AppManifest.xml. E.g. icons and tile images
   outputDir         - The output directory for the finished MSIX package.
   packageName       - Optional name for the finished MSIX package. If not provided a name will be derived from AppManifest.xml.
   windowsKitVersion - Optional version of the WindowsKit to use. If WindowsKitPath is provide then it will trump this. If neither WindowsKitVersion nor

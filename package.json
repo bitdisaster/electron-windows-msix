@@ -7,7 +7,13 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "tsc",
-    "test": "tsc & node ./test/testing.js"
+    "harness": "tsc & node ./harness/testing.js",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "wallaby": {
+    "debug": true,
+    "trace": true
   },
   "repository": {
     "type": "git",
@@ -27,10 +33,13 @@
   "homepage": "https://github.com/bitdisaster/electron-windows-msix#readme",
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
-    "typescript": "^5.3.3"
+    "@vitest/coverage-istanbul": "3.2.4",
+    "typescript": "^5.3.3",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "chalk": "^3.0.0",
-    "fs-extra": "^11.2.0"
+    "fs-extra": "^11.2.0",
+    "xml-escape": "^1.1.0"
   }
 }

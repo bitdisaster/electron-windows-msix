@@ -5,27 +5,41 @@ import { log } from "./logger";
 import { ManifestVariables, PackagingOptions, ProgramOptions } from "./types";
 import { getCertPublisher } from './msix';
 import { WindowsVersion } from './win-version';
+import { manifest } from './manifestation';
 
 const MIN_ARM_WIN_KIT_VERSION = '10.0.22621.0';
 const WIN_KIT_BIN_PATH = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin';
 const MAKE_PRI_EXE = 'makepri.exe';
 const MAKE_APPX_EXE = 'makeappx.exe';
 const SIGN_TOOL = 'SignTool.exe';
+const MAKE_CERT_EXE = 'makecert.exe';
 
-const getBinaries = async (windowsKitPath: string) => {
+export const getBinaries = async (windowsKitPath: string) => {
   const binaries = {
     makeAppx: path.join(windowsKitPath, MAKE_APPX_EXE),
     makePri: path.join(windowsKitPath, MAKE_PRI_EXE),
     signTool: path.join(windowsKitPath, SIGN_TOOL),
+    makeCert: path.join(windowsKitPath, MAKE_CERT_EXE),
   };
 
   if(!(await fs.exists(binaries.makeAppx))) log.error(`MakeAppx binary ${MAKE_APPX_EXE} not found in:`, true, { windowsKitPath });
   if(!(await fs.exists(binaries.makePri))) log.error(`MakePri binary ${MAKE_PRI_EXE} not found in:`, true, { windowsKitPath });
   if(!(await fs.exists(binaries.signTool))) log.error(`SignTool binary ${SIGN_TOOL} not found in:`, true, { windowsKitPath });
+  if(!(await fs.exists(binaries.makeCert))) log.error(`MakeCert binary ${MAKE_CERT_EXE} not found in:`, true, { windowsKitPath });
   return binaries;
 }
 
-const ensureFolders = async (options: PackagingOptions) => {
+export const removeFileExtension = (executablePath: string) => {
+  if(!executablePath) return undefined;
+  const executable = path.basename(executablePath);
+  return executable.replace(/\.[^\/.]+$/, "");
+}
+
+export const removePublisherPrefix = (publisher: string) => {
+  return publisher.replace(/^CN=/, "");
+}
+
+export const ensureFolders = async (options: PackagingOptions) => {
   const outputDir = options.outputDir;
   const layoutDir = path.join(options.outputDir, 'msix_layout');
 
@@ -38,71 +52,39 @@ const ensureFolders = async (options: PackagingOptions) => {
   }
 
   log.debug('Creating layout dir', { layoutDir });
-    await fs.ensureDir(layoutDir);
+  await fs.ensureDir(layoutDir);
 
   return { outputDir, layoutDir };
 }
-export const getManifestVariables = async (options: PackagingOptions) : Promise<ManifestVariables> => {
-  const manifestXml = (await fs.readFile(options.appManifest)).toString();
-  const minWinVersionRegEx = /MinVersion="(.*?)"/s;
-  const appNameRegEx = /<DisplayName>(.*?)<\/DisplayName>/s;
-  const archRegEx = /ProcessorArchitecture="(.*?)"/s;
-  const sparseRegex = /<uap10:AllowExternalContent>\s*true\s*<\/uap10:AllowExternalContent>/s;
-  const publisherRegex = /Publisher="(.*?)"/s
-  let osMinVersion: string;
-  let appName: string;
-  let packageArch: string;
-  let isSparsePackage = false;
-  let publisher: string
 
-  let match = manifestXml.match(minWinVersionRegEx);
-  if (match) {
-    osMinVersion = match[1];
-  }
-
-  match = manifestXml.match(appNameRegEx);
-  if (match) {
-    appName = match[1];
-  }
-
-  match = manifestXml.match(archRegEx);
-  if (match) {
-    packageArch = match[1];
-  }
-
-  match = manifestXml.match(sparseRegex);
-  if (match) {
-    isSparsePackage = true;
-  }
-
-  match = manifestXml.match(publisherRegex);
-  if (match) {
-    publisher = match[1];
-  }
-
-  const manifestVariables : ManifestVariables = {
-    osMinVersion,
-    appName,
-    packageArch,
-    isSparsePackage,
-    publisher
-  }
-
-  return manifestVariables;
-}
-
-
-export const verifyOptions = async (options: PackagingOptions, manifestVars: ManifestVariables) => {
-  const { isSparsePackage, publisher } = manifestVars;
+export const verifyOptions = async (options: PackagingOptions, manifestVars?: ManifestVariables) => {
+  const { manifestIsSparsePackage, manifestPublisher } = manifestVars || {};
+  const publisher = manifestPublisher || options.manifestVariables?.publisher;
+  let hasManifestParams = false;
   log.debug('You are calling with following packaging options', options)
-  if(!options.appManifest) log.error('Path to application manifest <appManifest> not provided.', true);
-  if(!(await fs.exists(options.appManifest))) log.error('Path to application manifest <appManifest> does not exist.', true, { appManifest: options.appManifest });
-  if(!options.appDir && !isSparsePackage) log.error('Path to application <appDir> not provided.', true);
-  if(!(await fs.exists(options.appDir)) && !isSparsePackage) log.error('Path to application <appDir> does not exist.', true, { appDir: options.appDir });
-  if(!options.packageAssets) log.error('Path to packages assets <packageAssets> not provided.', true);
-  if(!(await fs.exists(options.appManifest))) log.error('Path to packages assets <packageAssets> does not exist.', true, { packageAssets: options.packageAssets });
-  if(!options.cert && !options.signParams) log.warn('Path to cert <cert> and/or signParams not provided. Package will not be signed!');
-  if(options.cert && options.signParams) log.warn('Path to cert <cert> and signParams provided. signParams will take priority!');
+  if(!options.appManifest && options.manifestVariables) {
+    if(!options.manifestVariables.packageVersion) log.error('Neither package version <packageVersion> nor app manifest <appManifest> provided.', true);
+    if(!options.manifestVariables.publisher) log.error('Neither publisher <publisher> nor app manifest <appManifest> provided.', true);
+    if(!options.manifestVariables.publisherDisplayName) log.warn('Neither publisher display name <publisherDisplayName> nor app manifest <appManifest> provided. Using publisher as display name.');
+    if(!options.manifestVariables.packageDisplayName) log.warn('Neither package display name <packageDisplayName> nor app manifest <appManifest> provided. Using app executable as display name.');
+    if(!options.manifestVariables.appExecutable) log.error('Neither app executable <appExecutable> nor app manifest <appManifest> provided.', true);
+    if(!options.manifestVariables.targetArch) log.error('Neither target architecture <targetArch> nor app manifest <appManifest> provided.', true);
+    if(!options.manifestVariables.packageMinOSVersion) log.warn('Neither package min OS version <packageMinOSVersion> nor app manifest <appManifest> provided. Using default OS version 10.0.14393.0.');
+    if(!options.manifestVariables.packageMaxOSVersionTested) log.warn('Neither package max OS version tested <packageMaxOSVersionTested> nor app manifest <appManifest> provided. Using default OS version 10.0.14393.0.');
+    if(!options.manifestVariables.packageIdentity) log.error('Neither package identity <packageIdentity> nor app manifest <appManifest> provided.', true);
+    if(!options.manifestVariables.appDisplayName) log.warn('Neither app display name <appDisplayName> nor app manifest <appManifest> provided. Using app executable as display name.');
+    if(!options.manifestVariables.packageDescription) log.warn('Neither package description <packageDescription> nor app manifest <appManifest> provided. Using app executable as description.');
+    if(!options.manifestVariables.packageBackgroundColor) log.warn('Neither package background color <packageBackgroundColor> nor app manifest <appManifest> provided. Using default background color transparent.');
+    hasManifestParams = true;
+  }
+  if(!hasManifestParams && !options.appManifest) log.error('Neither app manifest <appManifest> nor manifest variables <manifestVariables> provided.', true);
+  if(options.appManifest && !(await fs.exists(options.appManifest))) log.error('Path to application manifest <appManifest> does not exist.', true, { appManifest: options.appManifest });
+  if(!options.appDir && !manifestIsSparsePackage) log.error('Path to application <appDir> not provided.', true);
+  if(!(await fs.exists(options.appDir)) && !manifestIsSparsePackage) log.error('Path to application <appDir> does not exist.', true, { appDir: options.appDir });
+  if(!options.packageAssets) log.warn('Path to packages assets <packageAssets> not provided, using default assets.');
+  if(options.packageAssets && !(await fs.exists(options.packageAssets))) log.error('Path to packages assets provided but <packageAssets> does not exist.', true, { packageAssets: options.packageAssets });
+  if(!options.cert) log.warn('Path to cert <cert> not provided. A dev cert will be created and the package will be signed with it!');
+  if(options.cert && !!options.signParams) log.warn('Path to cert <cert> and custom signParams provided. signParams will take priority!');
   if(options.cert && !(await fs.exists(options.cert))) log.error('Path to cert <cert> does not exist.', true, { cert: options.cert });
   if(options.cert && !options.cert_pass) log.warn('Cert cert password <cert_pass> not provided.');
   if(options.cert) {
@@ -117,8 +99,10 @@ export const setLogLevel = (options: PackagingOptions) => {
   globalThis.DEBUG = logLevel === 'debug';
 }
 
-export const locateMSIXTooling = async (options: PackagingOptions, manifestVars: ManifestVariables) => {
+export const locateMSIXTooling = async (options: PackagingOptions, manifestVars?: ManifestVariables) => {
   const { appManifest, windowsKitVersion, windowsKitPath } = options;
+  let arch =  process.env.PROCESSOR_ARCHITECTURE === 'ARM64' ? 'arm64' : 'x64';
+
   if(windowsKitPath) {
     log.debug('WindowsKitPath was provided and takes priority over WindowsKitVersion. Checking if it exists....', {windowsKitPath});
     if(await fs.pathExists(windowsKitPath)) {
@@ -132,7 +116,6 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars:
     log.debug('No WindowsKitPath provided. Will try WindowsKitVersion next.');
   }
 
-  let arch = process.arch === 'ia32' ? 'x86' : process.arch
   if(windowsKitVersion) {
     // Older versions than WinKit 10.0.22621.0 for ARM are missing the makeAppx.exe and we will fall back to x64 in that case.
     if(WindowsVersion.IsOlder(windowsKitVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
@@ -146,21 +129,21 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars:
       log.debug(`WindowsKit version ${windowsKitVersion} exists. Getting binary paths.`, binaries);
       return binaries;
     }else {
-      log.warn('WindowsKitVersion was provided but does not exist.', windowsKitPathExec);
+      log.error('WindowsKitVersion was provided but does not exist.', true, windowsKitPathExec);
     }
   } else {
     log.debug('No WindowsKitVersion provided. Will try AppxManifest.xml min OS version next.');
   }
 
   if(appManifest) {
-    const { osMinVersion } = manifestVars;
-    if (osMinVersion) {
+    const { manifestOsMinVersion } = manifestVars;
+    if (manifestOsMinVersion) {
       // Older versions than WinKit 10.0.22621.0 for ARM are missing the makeAppx.exe and we will fall back to x64 in that case.
-      if(WindowsVersion.IsOlder(osMinVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
+      if(WindowsVersion.IsOlder(manifestOsMinVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
         arch = 'x64';
       }
-      log.debug('WindowsKitVersion was derived from OSMiversion of the AppxManifest. Checking if it exists....', {windowsKitVersion});
-      const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, osMinVersion, arch);
+      log.debug('WindowsKitVersion was derived from OSMinVersion of the AppxManifest. Checking if it exists....', {windowsKitVersion});
+      const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, manifestOsMinVersion, arch);
 
       if(await fs.pathExists(windowsKitPathExec)) {
         const binaries = await getBinaries(windowsKitPathExec);
@@ -173,15 +156,30 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars:
       log.error("Couldn't find Windows Kit version in AppManifest.");
     }
   }
+
+  log.debug('No information on WindowsKitVersion was provided, using default binaries. Checking if it exists....', {windowsKitVersion});
+  const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, arch);
+  if(await fs.pathExists(windowsKitPathExec)) {
+    const binaries = await getBinaries(windowsKitPathExec);
+    log.debug(`Getting binary paths from default WindowsKit path.`, binaries);
+    return binaries;
+  } else {
+    log.error('No information on WindowsKitVersion was provided and default WindowsKit path does not exist.', true, windowsKitPathExec);
+  }
+
   log.error('Unable to locate MSIX Tooling. Giving up!', true);
 }
 
-export const makeProgramOptions = async (options: PackagingOptions, manifestVars: ManifestVariables) => {
-  const { makeAppx, makePri, signTool } = await locateMSIXTooling(options, manifestVars);
+
+export const makeProgramOptions = async (options: PackagingOptions, manifestVars?: ManifestVariables) => {
+  const { makeAppx, makePri, signTool, makeCert} = await locateMSIXTooling(options, manifestVars);
   const { outputDir, layoutDir } = await ensureFolders(options);
-  const { appName, packageArch, isSparsePackage } = manifestVars;
-  const msiPackageName = options.packageName || (packageArch ? `${appName}_${packageArch}.msix` : `${appName}.msix`);
-  const msix = path.join(outputDir, msiPackageName);
+  const { manifestAppName, manifestPackageArch, manifestIsSparsePackage } = manifestVars || {};
+  const appName = manifestAppName || removeFileExtension(options.manifestVariables?.appExecutable) || 'app';
+  const packageArch = manifestPackageArch || options.manifestVariables?.targetArch;
+  const isSparsePackage = manifestIsSparsePackage || false;
+  const msixPackageName = options.packageName || (packageArch ? `${appName}_${packageArch}.msix` : `${appName}.msix`);
+  const msix = path.join(outputDir, msixPackageName);
   const appManifestLayout = path.join(layoutDir, `AppxManifest.xml`);
   const assetsLayout = path.join(layoutDir, `assets`);
   const appLayout = path.join(layoutDir, `app`);
@@ -203,19 +201,21 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
     }
   }
   const sign = !!signParams;
+  const appManifestIn = await manifest(options);
 
   const program: ProgramOptions = {
     makeMsix: makeAppx,
     makePri,
+    makeCert,
     signTool,
     outputDir,
     layoutDir,
     msix,
     appDir: options.appDir,
     appLayout,
-    appManifestIn: options.appManifest,
+    appManifestIn,
     appManifestLayout,
-    assetsIn: options.packageAssets,
+    assetsIn: options.packageAssets || path.join(__dirname, '..', 'static', 'assets'),
     assetsLayout,
     cert: options.cert,
     cert_pass: options.cert_pass,
@@ -232,9 +232,28 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
 }
 
 export const createLayout = async (program: ProgramOptions) => {
-  await fs.copyFile(program.appManifestIn, program.appManifestLayout);
+  await fs.writeFile(program.appManifestLayout, program.appManifestIn);
   await fs.copy(program.assetsIn, program.assetsLayout);
   if(!program.isSparsePackage) {
     await fs.copy(program.appDir, program.appLayout);
   }
 }
+
+// export async function createDevCertificate(
+//   publisher: string,
+//   { certFilePath, certFileName, install, program }: CreateDefaultCertOpts
+// ): Promise<string> {
+//   const makeCertOptions = {
+//     publisher,
+//     certFilePath: certFilePath || process.cwd(),
+//     certFileName: certFileName || 'default',
+//     install: typeof install === 'boolean' ? install : false,
+//     program: program || { windowsKit: path.dirname(await findSdkTool('makecert.exe')) },
+//   };
+
+//   if (!isValidPublisherName(publisherName)) {
+//     throw new Error(`Received invalid publisher name: '${publisherName}' did not conform to X.500 distinguished name syntax for MakeCert.`);
+//   }
+
+//   return makeCert(makeCertOptions);
+// }

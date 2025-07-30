@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'vitest'
-import { WindowsVersion } from '../src/win-version';
+import { WindowsVersion } from '../../src/win-version';
 
 describe('win-version', () => {
   it('should parse version string correctly', () => {

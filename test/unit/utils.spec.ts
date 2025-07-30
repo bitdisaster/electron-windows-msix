@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra'
 import {
   log
-} from '../src/logger';
+} from '../../src/logger';
 import {
   expect,
   describe,
@@ -22,13 +22,13 @@ import {
   makeProgramOptions,
   createLayout,
   getBinaries
-} from '../src/utils';
+} from '../../src/utils';
 import {
   ManifestVariables,
   PackagingOptions,
   ProgramOptions
-} from '../src/types';
-import { getCertPublisher } from '../src/msix';
+} from '../../src/types';
+import { getCertPublisher } from '../../src/msix';
 import path from 'path';
 
 let originalProcessorArchitecture = process.env.PROCESSOR_ARCHITECTURE;
@@ -44,8 +44,8 @@ const minimalPackagingOptions: PackagingOptions = {
   outputDir: 'C:\\out',
 }
 
-vi.mock('../src/logger');
-vi.mock('../src/msix');
+vi.mock('../../src/logger');
+vi.mock('../../src/msix');
 vi.mock('fs-extra', async (importOriginal) => {
   const actual = await importOriginal() as Record < string,
     any > ;
@@ -84,7 +84,7 @@ describe('utils', () => {
     });
 
     it('should throw an error if the binaries are not found', async () => {
-      vi.mocked(fs.exists).mockResolvedValue(false);
+      vi.mocked(fs.exists).mockResolvedValue(false as any);
       await getBinaries('C:\\Program Files (x86)\\Windows Kits\\10\\bin');
       expect(log.error).toHaveBeenCalledWith('MakeAppx binary makeappx.exe not found in:', true, { windowsKitPath: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin' });
       expect(log.error).toHaveBeenCalledWith('MakePri binary makepri.exe not found in:', true, { windowsKitPath: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin' });
@@ -124,7 +124,7 @@ describe('utils', () => {
     });
 
     it('should empty output dir if it exists', async () => {
-      vi.mocked(fs.exists).mockResolvedValue(true);
+      vi.mocked(fs.exists).mockResolvedValue(true as any);
       const {
         outputDir,
         layoutDir
@@ -139,7 +139,7 @@ describe('utils', () => {
     });
 
     it('should create output dir if it does not exist', async () => {
-      vi.mocked(fs.exists).mockResolvedValue(false);
+      vi.mocked(fs.exists).mockResolvedValue(false as any);
       const {
         outputDir,
         layoutDir
@@ -241,7 +241,7 @@ describe('utils', () => {
             packageIdentity: 'Electron.App',
           } as any
         }
-        vi.mocked(fs.exists).mockResolvedValue(true);
+        vi.mocked(fs.exists).mockResolvedValue(true as any);
         await verifyOptions(packagingOptions);
         expect(log.warn).toHaveBeenCalledWith('Neither publisher display name <publisherDisplayName> nor app manifest <appManifest> provided. Using publisher as display name.');
       });
@@ -258,7 +258,7 @@ describe('utils', () => {
             publisherDisplayName: 'Electron',
           } as any
         }
-        vi.mocked(fs.exists).mockResolvedValue(true);
+        vi.mocked(fs.exists).mockResolvedValue(true as any);
         await verifyOptions(packagingOptions);
         expect(log.warn).toHaveBeenCalledWith('Neither package display name <packageDisplayName> nor app manifest <appManifest> provided. Using app executable as display name.');
       });
@@ -275,7 +275,7 @@ describe('utils', () => {
             publisherDisplayName: 'Electron',
           } as any
         }
-        vi.mocked(fs.exists).mockResolvedValue(true);
+        vi.mocked(fs.exists).mockResolvedValue(true as any);
         await verifyOptions(packagingOptions);
         expect(log.warn).toHaveBeenCalledWith('Neither package min OS version <packageMinOSVersion> nor app manifest <appManifest> provided. Using default OS version 10.0.14393.0.');
       });
@@ -293,7 +293,7 @@ describe('utils', () => {
             packageMinOSVersion: '10.0.14393.0',
           } as any
         }
-        vi.mocked(fs.exists).mockResolvedValue(true);
+        vi.mocked(fs.exists).mockResolvedValue(true as any);
         await verifyOptions(packagingOptions);
         expect(log.warn).toHaveBeenCalledWith('Neither package max OS version tested <packageMaxOSVersionTested> nor app manifest <appManifest> provided. Using default OS version 10.0.14393.0.');
       });
@@ -312,7 +312,7 @@ describe('utils', () => {
             packageMaxOSVersionTested: '10.0.14393.0',
           } as any
         }
-        vi.mocked(fs.exists).mockResolvedValue(true);
+        vi.mocked(fs.exists).mockResolvedValue(true as any);
         await verifyOptions(packagingOptions);
         expect(log.warn).toHaveBeenCalledWith('Neither app display name <appDisplayName> nor app manifest <appManifest> provided. Using app executable as display name.');
       });
@@ -332,7 +332,7 @@ describe('utils', () => {
             appDisplayName: 'Electron',
           } as any
         }
-        vi.mocked(fs.exists).mockResolvedValue(true);
+        vi.mocked(fs.exists).mockResolvedValue(true as any);
         await verifyOptions(packagingOptions);
         expect(log.warn).toHaveBeenCalledWith('Neither package description <packageDescription> nor app manifest <appManifest> provided. Using app executable as description.');
       });
@@ -353,7 +353,7 @@ describe('utils', () => {
             packageDescription: 'Electron',
           } as any
         }
-        vi.mocked(fs.exists).mockResolvedValue(true);
+        vi.mocked(fs.exists).mockResolvedValue(true as any);
         await verifyOptions(packagingOptions);
         expect(log.warn).toHaveBeenCalledWith('Neither package background color <packageBackgroundColor> nor app manifest <appManifest> provided. Using default background color transparent.');
       });
@@ -381,7 +381,7 @@ describe('utils', () => {
         } as any
       }
 
-      vi.mocked(fs.exists).mockResolvedValue(true);
+      vi.mocked(fs.exists).mockResolvedValue(true as any);
       vi.mocked(getCertPublisher).mockResolvedValue('Electron');
       await verifyOptions(packagingOptions);
       expect(log.error).not.toHaveBeenCalled();
@@ -405,7 +405,7 @@ describe('utils', () => {
         manifestPublisher: 'Electron'
       }
 
-      vi.mocked(fs.exists).mockResolvedValue(true);
+      vi.mocked(fs.exists).mockResolvedValue(true as any);
       vi.mocked(getCertPublisher).mockResolvedValue('Electron');
       await verifyOptions(packagingOptions, manifestVariables);
       expect(log.error).not.toHaveBeenCalled();
@@ -425,7 +425,7 @@ describe('utils', () => {
         ...minimalPackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
       }
-      vi.mocked(fs.exists).mockResolvedValue(false);
+      vi.mocked(fs.exists).mockResolvedValue(false as any);
       await verifyOptions(packagingOptions);
       expect(log.error).toHaveBeenCalledWith('Path to application manifest <appManifest> does not exist.', true, { appManifest: 'C:\\app\\app.manifest' });
     });
@@ -436,7 +436,7 @@ describe('utils', () => {
         appManifest: 'C:\\app\\app.manifest',
       }
       delete packagingOptions.appDir;
-      vi.mocked(fs.exists).mockResolvedValueOnce(true);
+      vi.mocked(fs.exists).mockResolvedValueOnce(true as any);
       await verifyOptions(packagingOptions, { manifestIsSparsePackage: false } as any);
       expect(log.error).toHaveBeenCalledWith('Path to application <appDir> not provided.', true);
     });
@@ -446,7 +446,7 @@ describe('utils', () => {
         ...minimalPackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
       }
-      vi.mocked(fs.exists).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+      vi.mocked(fs.exists).mockResolvedValueOnce(true as any).mockResolvedValueOnce(false as any);
       await verifyOptions(packagingOptions, { manifestIsSparsePackage: false } as any);
       expect(log.error).toHaveBeenCalledWith('Path to application <appDir> does not exist.', true, { appDir: 'C:\\app' });
     });
@@ -467,7 +467,10 @@ describe('utils', () => {
         appManifest: 'C:\\app\\app.manifest',
         packageAssets: 'C:\\assets',
       } as any
-      vi.mocked(fs.exists).mockResolvedValueOnce(true).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+      vi.mocked(fs.exists)
+        .mockResolvedValueOnce(true as any)
+        .mockResolvedValueOnce(true as any)
+        .mockResolvedValueOnce(false as any );
       await verifyOptions(packagingOptions, { manifestIsSparsePackage: false } as any);
       expect(log.error).toHaveBeenCalledWith('Path to packages assets provided but <packageAssets> does not exist.', true, { packageAssets: 'C:\\assets' });
     });
@@ -514,9 +517,9 @@ describe('utils', () => {
         cert: 'C:\\cert.pfx',
       } as any
       vi.mocked(fs.exists)
-        .mockResolvedValueOnce(true)
-        .mockResolvedValueOnce(true)
-        .mockResolvedValueOnce(false);
+        .mockResolvedValueOnce(true as any)
+        .mockResolvedValueOnce(true as any)
+        .mockResolvedValueOnce(false as any);
 
       await verifyOptions(packagingOptions, { manifestIsSparsePackage: false } as any);
       expect(log.error).toHaveBeenCalledWith('Path to cert <cert> does not exist.', true, { cert: 'C:\\cert.pfx' });
@@ -587,7 +590,7 @@ describe('utils', () => {
         windowsKitPath: 'C:\\windowskit',
 
       }
-      vi.mocked(fs.exists).mockResolvedValue(true);
+      vi.mocked(fs.exists).mockResolvedValue(true as any);
       const binaries = await locateMSIXTooling(packagingOptions);
       expect(binaries).toBeDefined();
       expect(binaries).toStrictEqual({
@@ -605,7 +608,7 @@ describe('utils', () => {
           targetArch: 'x64',
         } as any
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(false)
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(false as any)
       await locateMSIXTooling(packagingOptions)
       expect(log.error).toHaveBeenCalledWith('The WindowsKitPath was provided but does not exist.', true, 'C:\\windowskit');
     });
@@ -645,7 +648,7 @@ describe('utils', () => {
           targetArch: 'x64',
         } as any
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(false)
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(false as any)
       await locateMSIXTooling(packagingOptions)
       expect(log.error).toHaveBeenCalledWith('WindowsKitVersion was provided but does not exist.', true, 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.14393.42\\x64');
     });
@@ -695,7 +698,7 @@ describe('utils', () => {
         ...minimalPackagingOptions,
         appManifest: 'C:\\app\\app.manifest'
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(false)
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(false as any)
       await locateMSIXTooling(packagingOptions, { manifestOsMinVersion: '10.0.22621.0', manifestPackageArch: 'x64' } as any);
       expect(log.error).toHaveBeenCalledWith('WindowsKitVersion read from AppManifest but WindowsKit does not exist.', true, 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.22621.0\\x64');
     });
@@ -728,7 +731,7 @@ describe('utils', () => {
         ...minimalPackagingOptions,
       }
       overrideProcessorArchitecture('ARM64');
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(true)
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any)
       const binaries = await locateMSIXTooling(packagingOptions);
       expect(binaries).toStrictEqual({
         makeAppx: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\arm64\\makeappx.exe',
@@ -741,7 +744,7 @@ describe('utils', () => {
       const packagingOptions: PackagingOptions = {
         ...minimalPackagingOptions,
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(false)
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(false as any)
       await locateMSIXTooling(packagingOptions);
       expect(log.error).toHaveBeenCalledWith('No information on WindowsKitVersion was provided and default WindowsKit path does not exist.', true, 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64');
     });
@@ -751,7 +754,7 @@ describe('utils', () => {
   describe('makeProgramOptions', () => {
     const defaultExpectedProgramOptions = {
       appDir: 'C:\\app',
-      assetsIn: path.join(__dirname, '..', 'static', 'assets'),
+      assetsIn: path.join(__dirname, '..', '..', 'static', 'assets'),
       makeMsix: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64\\makeappx.exe',
       makePri: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64\\makepri.exe',
       makeCert: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64\\makecert.exe',
@@ -780,7 +783,7 @@ describe('utils', () => {
           publisher: 'Electron',
         } as any
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
@@ -795,7 +798,7 @@ describe('utils', () => {
         //   publisher: 'Electron',
         // } as any
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
       const programOptions = await makeProgramOptions(packagingOptions, { manifestAppName: 'MyApp'} as any);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
@@ -806,7 +809,7 @@ describe('utils', () => {
       const packagingOptions: PackagingOptions = {
         ...minimalPackagingOptions,
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
       const programOptions = await makeProgramOptions(packagingOptions, { manifestAppName: 'MyApp', manifestPackageArch: 'arm64'} as any);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
@@ -822,7 +825,7 @@ describe('utils', () => {
           appExecutable: 'MySuperApp.exe',
         } as any
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
@@ -838,7 +841,7 @@ describe('utils', () => {
         } as any,
         createPri: false,
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
@@ -854,7 +857,7 @@ describe('utils', () => {
           publisher: 'Electron',
         } as any
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
@@ -870,7 +873,8 @@ describe('utils', () => {
           publisher: 'Electron',
         } as any
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
+      vi.mocked(getCertPublisher).mockResolvedValueOnce('Electron');
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
@@ -887,7 +891,7 @@ describe('utils', () => {
           publisher: 'Electron',
         } as any
       }
-      vi.mocked(fs.pathExists).mockResolvedValueOnce(true);
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;

@@ -38,7 +38,7 @@ const  run = async (executable: string, args: Array<string>)  => {
   })
 }
 
-export const getCertPublisher = async (cert: string, cert_pass: string) => {
+export const getCertPublisher = async (cert: string, cert_pass?: string) => {
   const args = [];
   if(cert_pass) {
     args.push('-p', cert_pass);

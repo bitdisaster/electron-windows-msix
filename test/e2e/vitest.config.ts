@@ -2,9 +2,9 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
+    name: 'e2e',
     include: [
-      'test/unit/**/*.spec.ts',
-      'test/e2e/**/*.spec.ts'
+      'test/e2e/*.spec.ts',
     ]
   },
 })

@@ -1,12 +1,12 @@
 import { spawn } from 'child_process';
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getCertPublisher, make, pri, priConfig, sign } from "../src/msix";
+import { getCertPublisher, make, pri, priConfig, sign } from "../../src/msix";
 import EventEmitter from 'events';
-import { log } from '../src/logger';
+import { log } from '../../src/logger';
 
 vi.mock('child_process', () => ({
   spawn: vi.fn(() => {
-    const emitter = new EventEmitter();
+    const emitter = new EventEmitter() as any;
     // Simulate stdout, stderr, exit, and close events
     setImmediate(() => {
       emitter.emit('data', Buffer.from('mocked spawn output')); // General data event (if used)
@@ -25,7 +25,7 @@ vi.mock('child_process', () => ({
   }),
 }));
 
-vi.mock('../src/logger');
+vi.mock('../../src/logger');
 
 describe('msix', () => {
   beforeEach(() => {
@@ -39,7 +39,7 @@ describe('msix', () => {
       Subject: CN=Electron
       Signature matches Public Key
       `;
-      const emitter = new EventEmitter();
+      const emitter = new EventEmitter() as any;
       setImmediate(() => {
         emitter.stdout.emit('data', Buffer.from(stdoutData));
         emitter.emit('exit', 0, null);
@@ -62,7 +62,7 @@ describe('msix', () => {
       Subject: CN=Electron
       Signature matches Public Key
       `;
-      const emitter = new EventEmitter();
+      const emitter = new EventEmitter() as any;
       setImmediate(() => {
         emitter.stdout.emit('data', Buffer.from(stdoutData));
         emitter.emit('exit', 0, null);
@@ -79,10 +79,10 @@ describe('msix', () => {
   });
 
   it('should log an error if the certutil command fails', async () => {
-    vi.mocked(spawn).mockImplementationOnce((_, __) => {
-      const emitter = new EventEmitter();
+    vi.mocked(spawn).mockImplementationOnce(() => {
+      const emitter = new EventEmitter() as any;
       setImmediate(() => {
-        emitter.stderr.emit('data', Buffer.from('certutil: Error: oops'));
+        emitter['stderr'].emit('data', Buffer.from('certutil: Error: oops'));
         emitter.emit('exit', 1, null);
       });
 
@@ -97,7 +97,7 @@ describe('msix', () => {
 
   it('should log an error if no publisher is found in the cert', async () => {
     vi.mocked(spawn).mockImplementationOnce((_, __) => {
-      const emitter = new EventEmitter();
+      const emitter = new EventEmitter() as any;
       setImmediate(() => {
         emitter.stdout.emit('data', Buffer.from(''));
         emitter.emit('exit', 0, null);

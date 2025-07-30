@@ -1,9 +1,9 @@
 import * as path from 'path'
 
 import { expect, describe, it } from 'vitest'
-import { makeProgramOptions } from '../src/utils';
-import { ManifestGenerationVariables, ManifestVariables, PackagingOptions } from '../src/types';
-import { getManifestVariables, manifest } from '../src/manifestation';
+import { makeProgramOptions } from '../../src/utils';
+import { ManifestGenerationVariables, ManifestVariables, PackagingOptions } from '../../src/types';
+import { getManifestVariables, manifest } from '../../src/manifestation';
 
 const minimalManifestVariables: ManifestGenerationVariables = {
   appExecutable: 'HelloMSIX.exe',

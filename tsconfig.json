@@ -2,11 +2,13 @@
   "compilerOptions" : {
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "ES2020",
     "moduleResolution": "node",
     "sourceMap": true,
     "declaration": true,
     "outDir": "lib",
+    "skipLibCheck": true,
+    "lib": ["ES2020"]
   },
-  "lib": ["es2015"]
+  "include": ["src/**/*.ts"]
 }

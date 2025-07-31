@@ -1,9 +1,11 @@
+import { getManifestVariables } from './manifestation';
 import { make, pri, priConfig, sign } from './msix';
 import { PackagingOptions } from './types';
-import { createLayout, getManifestVariables, makeProgramOptions, setLogLevel, verifyOptions } from './utils';
+import { createLayout, ensureFolders, makeProgramOptions, setLogLevel, verifyOptions } from './utils';
 
 export const packageMSIX = async (options: PackagingOptions) => {
   setLogLevel(options);
+  await ensureFolders(options);
   const manifestVars = await getManifestVariables(options)
   await verifyOptions(options, manifestVars);
   const program = await makeProgramOptions(options, manifestVars);

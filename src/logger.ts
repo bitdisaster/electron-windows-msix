@@ -5,7 +5,7 @@ export class log {
     const logMessage = `${level}: ${message}`;
     let logObject = '';
     if(object)
-      logObject = JSON.stringify(object, null, 2 );
+      logObject = JSON.stringify(object, null, 2 ).replace(/\\r\\n/g, '\n').replace(/\\\\/g, '\\').replace(/\\\"/g, '"');
 
     if(level === 'debug' && !!globalThis.DEBUG) {
       console.log(chalk.grey(logMessage));

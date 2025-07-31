@@ -1,9 +1,10 @@
 import { log } from "./logger"
 import { ProgramOptions } from "./types";
+import * as childProcess from 'child_process';
 
 const  run = async (executable: string, args: Array<string>)  => {
   return new Promise<string>((resolve, reject) => {
-    const proc = require('child_process').spawn(executable, args, {});
+    const proc = childProcess.spawn(executable, args, {});
     log.debug(`Calling ${executable} with args`, args);
 
     const cleanOutData = (data: any) => {
@@ -24,7 +25,7 @@ const  run = async (executable: string, args: Array<string>)  => {
       stderr += data;
     });
 
-    proc.on('exit', (code) => {
+    proc.on('exit', (code: number) => {
       log.debug(`stdout of ${executable}`, cleanOutData(stdout));
       if (code !== 0) {
         log.error(`stderr of ${executable}`, false, cleanOutData(stderr))
@@ -37,7 +38,7 @@ const  run = async (executable: string, args: Array<string>)  => {
   })
 }
 
-export const getCertPublisher = async (cert: string, cert_pass: string) => {
+export const getCertPublisher = async (cert: string, cert_pass?: string) => {
   const args = [];
   if(cert_pass) {
     args.push('-p', cert_pass);
@@ -89,8 +90,6 @@ export const make = async (program: ProgramOptions) => {
   if(isSparsePackage) {
     args.push('/nv');
   }
-
-
   await run(makeMsix, args);
 }
 

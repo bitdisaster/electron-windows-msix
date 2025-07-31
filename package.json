@@ -7,7 +7,13 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "tsc",
-    "test": "tsc & node ./test/testing.js"
+    "test:e2e": "vitest run --config=./test/e2e/vitest.config.ts",
+    "test:e2e:watch": "vitest --config=./test/e2e/vitest.config.ts",
+    "test:e2e:coverage": "vitest run --coverage --config=./test/e2e/vitest.config.ts",
+    "harness": "tsc & node ./test/testing.js",
+    "test:unit": "vitest run --config=./test/unit/vitest.config.ts",
+    "test:unit:watch": "vitest --config=./test/unit/vitest.config.ts",
+    "test:unit:coverage": "vitest run --coverage --config=./test/unit/vitest.config.ts"
   },
   "repository": {
     "type": "git",
@@ -27,10 +33,13 @@
   "homepage": "https://github.com/bitdisaster/electron-windows-msix#readme",
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
-    "typescript": "^5.3.3"
+    "@vitest/coverage-istanbul": "3.2.4",
+    "typescript": "^5.3.3",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "chalk": "^3.0.0",
-    "fs-extra": "^11.2.0"
+    "fs-extra": "^11.2.0",
+    "xml-escape": "^1.1.0"
   }
 }

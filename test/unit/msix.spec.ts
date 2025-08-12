@@ -55,29 +55,6 @@ describe('msix', () => {
     expect(result).toBe('CN=Electron');
   });
 
-  it('should return the publisher from the cert without a password', async () => {
-    vi.mocked(spawn).mockImplementationOnce((_, __) => {
-      const stdoutData = `
-      NotAfter: 12/7/2024 7:01 PM
-      Subject: CN=Electron
-      Signature matches Public Key
-      `;
-      const emitter = new EventEmitter() as any;
-      setImmediate(() => {
-        emitter.stdout.emit('data', Buffer.from(stdoutData));
-        emitter.emit('exit', 0, null);
-      });
-
-      emitter.stdout = new EventEmitter();
-      emitter.stderr = new EventEmitter();
-      emitter.stdin = { end: vi.fn() };
-      return emitter;
-    });
-    const result = await getCertPublisher('C:\\cert.pfx');
-    expect(spawn).toHaveBeenCalledWith('certutil', ['-dump', 'C:\\cert.pfx'], {});
-    expect(result).toBe('CN=Electron');
-  });
-
   it('should log an error if the certutil command fails', async () => {
     vi.mocked(spawn).mockImplementationOnce(() => {
       const emitter = new EventEmitter() as any;

@@ -1,9 +1,24 @@
 import * as path from 'path'
 
-import { expect, describe, it } from 'vitest'
+import { expect, describe, it, vi } from 'vitest'
 import { makeProgramOptions } from '../../src/utils';
 import { ManifestGenerationVariables, ManifestVariables, PackagingOptions } from '../../src/types';
 import { getManifestVariables, manifest } from '../../src/manifestation';
+
+vi.mock('fs-extra', async (importOriginal) => {
+  const actual = await importOriginal() as Record < string,
+    any > ;
+  return {
+    exists: vi.fn().mockReturnValue(true),
+    emptyDir: vi.fn(),
+    ensureDir: vi.fn(),
+    pathExists: vi.fn().mockReturnValue(true),
+    readFileSync: actual.readFileSync,
+    readFile: actual.readFile,
+    writeFile: vi.fn(),
+    copy: vi.fn(),
+  };
+});
 
 const minimalManifestVariables: ManifestGenerationVariables = {
   appExecutable: 'HelloMSIX.exe',
@@ -126,6 +141,19 @@ describe('manifestation', () => {
       expect(appManifestIn).toMatch(/DisplayName="Custom Display Name"/);
       expect(appManifestIn).toMatch(/Description="Custom Package Description"/);
       expect(appManifestIn).toMatch(/BackgroundColor="Custom Background Color"/);
+    });
+
+    it('should use packageMinOSVersion also as packageMaxOSVersionTested if not provided', async () => {
+      const packagingOptions: PackagingOptions = {
+        ...minimalPackagingOptions,
+        manifestVariables: {
+          ...minimalManifestVariables,
+          appDisplayName: 'Custom Display Name',
+          packageMinOSVersion: '10.0.17763.0',
+        },
+      }
+      const appManifestIn = await manifest(packagingOptions);
+      expect(appManifestIn).toMatch(/<TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.17763.0" \/>/);
     });
 
     it('should use packageDisplayName as display name if appDisplayName and packageDescription is not provided', async () => {

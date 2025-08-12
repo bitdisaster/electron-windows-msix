@@ -39,9 +39,21 @@ const restoreProcessorArchitecture = () => {
   process.env.PROCESSOR_ARCHITECTURE = originalProcessorArchitecture;
 }
 
+const incompletePackagingOptions: PackagingOptions = {
+  appDir: 'C:\\app',
+  outputDir: 'C:\\out',
+}
+
 const minimalPackagingOptions: PackagingOptions = {
   appDir: 'C:\\app',
   outputDir: 'C:\\out',
+  manifestVariables: {
+    publisher: 'Electron',
+    packageIdentity: 'com.electron.windows.msix',
+    packageVersion: '1.0.0.0',
+    appExecutable: 'app.exe',
+    targetArch: 'x64',
+  }
 }
 
 vi.mock('../../src/logger');
@@ -165,7 +177,7 @@ describe('utils', () => {
     describe('manifest variables', () => {
       it('should throw an error if no app manifest nor manifest variables are provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
         }
         await verifyOptions(packagingOptions);
         expect(log.error).toHaveBeenCalledWith('Neither app manifest <appManifest> nor manifest variables <manifestVariables> provided.', true);
@@ -173,7 +185,7 @@ describe('utils', () => {
 
       it('should throw an error if no package version is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: { } as any
         }
         await verifyOptions(packagingOptions);
@@ -182,7 +194,7 @@ describe('utils', () => {
 
       it('should throw an error if no publisher is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
           } as any
@@ -193,7 +205,7 @@ describe('utils', () => {
 
       it('should throw an error if no app executable is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -205,7 +217,7 @@ describe('utils', () => {
 
       it('should throw an error if no target architecture is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -218,7 +230,7 @@ describe('utils', () => {
 
       it('should throw an error if no package identity is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -232,7 +244,7 @@ describe('utils', () => {
 
       it('should warn if no publisher display name is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -248,7 +260,7 @@ describe('utils', () => {
 
       it('should warn if no package display name is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -265,7 +277,7 @@ describe('utils', () => {
 
       it('should warn if no packageMinOSVersion is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -282,7 +294,7 @@ describe('utils', () => {
 
       it('should warn if no packageMaxOSVersionTested is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -300,7 +312,7 @@ describe('utils', () => {
 
       it('should warn if no appDisplayName is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -319,7 +331,7 @@ describe('utils', () => {
 
       it('should warn if no packageDescription is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -339,7 +351,7 @@ describe('utils', () => {
 
       it('should warn if no packageBackgroundColor is provided', async () => {
         const packagingOptions: PackagingOptions = {
-          ...minimalPackagingOptions,
+          ...incompletePackagingOptions,
           manifestVariables: {
             packageVersion: '1.0.0',
             publisher: 'Electron',
@@ -361,7 +373,7 @@ describe('utils', () => {
 
     it('should not throw an error or warning if all manifest variables are provided', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         packageAssets: 'C:\\assets',
         cert: 'C:\\cert.pfx',
         cert_pass: '123456',
@@ -390,7 +402,7 @@ describe('utils', () => {
 
     it('should not throw an error or warning if valid manifest is provided', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         cert: 'C:\\cert.pfx',
         cert_pass: '123456',
         packageAssets: 'C:\\assets',
@@ -414,7 +426,7 @@ describe('utils', () => {
 
     it('should throw an error if no app manifest is provided', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
       }
       await verifyOptions(packagingOptions);
       expect(log.error).toHaveBeenCalledWith('Neither app manifest <appManifest> nor manifest variables <manifestVariables> provided.', true);
@@ -422,7 +434,7 @@ describe('utils', () => {
 
     it('should throw an error if app manifest does not exist', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
       }
       vi.mocked(fs.exists).mockResolvedValue(false as any);
@@ -432,7 +444,7 @@ describe('utils', () => {
 
     it('should throw an error if app dir is not provided', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
       }
       delete packagingOptions.appDir;
@@ -443,7 +455,7 @@ describe('utils', () => {
 
     it('should throw an error if app dir does not exist', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
       }
       vi.mocked(fs.exists).mockResolvedValueOnce(true as any).mockResolvedValueOnce(false as any);
@@ -453,7 +465,7 @@ describe('utils', () => {
 
     it('should warn if no package assets is provided', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
         packageAssets: undefined
       } as any
@@ -463,7 +475,7 @@ describe('utils', () => {
 
     it('should throw an error if package assets does not exist', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
         packageAssets: 'C:\\assets',
       } as any
@@ -475,19 +487,31 @@ describe('utils', () => {
       expect(log.error).toHaveBeenCalledWith('Path to packages assets provided but <packageAssets> does not exist.', true, { packageAssets: 'C:\\assets' });
     });
 
-    it('should throw an error if cert and signParams are not provided', async () => {
+    it('should warn if cert is not provided but cert_pass is', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
+        appManifest: 'C:\\app\\app.manifest',
+        packageAssets: 'C:\\assets',
+        cert_pass: '123456',
+      } as any
+      await verifyOptions(packagingOptions, { manifestIsSparsePackage: false } as any);
+      expect(log.warn).toHaveBeenCalledWith('Path to cert <cert> not provided. A dev cert will be created with the provided password and the package will be signed with it!');
+    });
+
+    it('should warn if cert and cert_pass are not provided', async () => {
+      const packagingOptions: PackagingOptions = {
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
         packageAssets: 'C:\\assets',
       } as any
       await verifyOptions(packagingOptions, { manifestIsSparsePackage: false } as any);
-      expect(log.warn).toHaveBeenCalledWith('Path to cert <cert> not provided. A dev cert will be created and the package will be signed with it!');
+      expect(log.warn).toHaveBeenCalledWith('Path to cert <cert> and cert password <cert_pass> not provided. A dev cert will be created and the package will be signed with it!');
     });
+
 
     it('should throw an error if cert and explicit signParams are provided', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
         packageAssets: 'C:\\assets',
         cert: 'C:\\cert.pfx',
@@ -500,7 +524,7 @@ describe('utils', () => {
 
     it('should warn if cert and signParams are provided', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
         cert: 'C:\\cert.pfx',
         signParams: ['/f', 'C:\\cert.pfx', '/p', '123456']
@@ -512,7 +536,7 @@ describe('utils', () => {
 
     it('should throw an error if cert does not exist', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
         cert: 'C:\\cert.pfx',
       } as any
@@ -527,7 +551,7 @@ describe('utils', () => {
 
     it('should warn if now cert password is provided', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
         cert: 'C:\\cert.pfx',
       } as any
@@ -538,19 +562,21 @@ describe('utils', () => {
 
     it('should throw an error if the publisher in the manifest does not match the publisher of the cert', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         appManifest: 'C:\\app\\app.manifest',
         cert: 'C:\\cert.pfx',
+        cert_pass: '123456',
       } as any
       vi.mocked(getCertPublisher).mockResolvedValue('Electron');
       await verifyOptions(packagingOptions, { manifestIsSparsePackage: false, manifestPublisher: 'NotElectron' } as any);
       expect(log.error).toHaveBeenCalledWith('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: 'NotElectron', cert_publisher: 'Electron'});
     });
 
-    it('should throw an error if the publisher in the manifest does not match the publisher of the cert', async () => {
+    it('should throw an error if the publisher in the manifest variables does not match the publisher of the cert', async () => {
       const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
+        ...incompletePackagingOptions,
         cert: 'C:\\cert.pfx',
+        cert_pass: '123456',
         manifestVariables: {
           packageVersion: '1.0.0',
           publisher: 'Electron',
@@ -752,7 +778,7 @@ describe('utils', () => {
   });
 
   describe('makeProgramOptions', () => {
-    const defaultExpectedProgramOptions = {
+    const defaultExpectedProgramOptions: ProgramOptions = {
       appDir: 'C:\\app',
       assetsIn: path.join(__dirname, '..', '..', 'static', 'assets'),
       makeMsix: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64\\makeappx.exe',
@@ -767,53 +793,67 @@ describe('utils', () => {
       appLayout: 'C:\\out\\msix_layout\\app',
       priConfig: 'C:\\out\\msix_layout\\priconfig.xml',
       priFile: 'C:\\out\\msix_layout\\resources.pri',
-      cert: undefined,
-      cert_pass: undefined,
+      publisher: 'Electron',
+      cert_pfx: 'C:\\out\\dev_cert.pfx',
+      cert_cer: 'C:\\out\\dev_cert.cer',
+      createDevCert: true,
+      cert_pass: '',
       createPri: true,
       isSparsePackage: false,
-      signParams: undefined,
-      sign: false,
-    };
+      signParams: [],
+      sign: true,
+    } as any;
+
+    const getDefaultSignParams = (cert_pass: string) => {
+      return ['-fd', 'sha256', '-f', 'C:\\out\\dev_cert.pfx', '-p', cert_pass];
+    }
 
     it('should return the program options with minimal packaging options', async () => {
-      const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
-        manifestVariables: {
-          targetArch: 'x64',
-          publisher: 'Electron',
-        } as any
-      }
       vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
-      const programOptions = await makeProgramOptions(packagingOptions);
+      const programOptions = await makeProgramOptions(minimalPackagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
-      expect(programOptions).toStrictEqual(defaultExpectedProgramOptions);
+      expect(programOptions.cert_pass.length).toBe(16);
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+         cert_pass: programOptions.cert_pass,
+         signParams:getDefaultSignParams(programOptions.cert_pass)
+        });
     });
 
     it('should use the app name from the manifest variables if provided', async () => {
-      const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
-        // manifestVariables: {
-        //   targetArch: 'x64',
-        //   publisher: 'Electron',
-        // } as any
-      }
       vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
-      const programOptions = await makeProgramOptions(packagingOptions, { manifestAppName: 'MyApp'} as any);
+      const programOptions = await makeProgramOptions(
+        {
+          ...minimalPackagingOptions,
+          manifestVariables: undefined
+        },
+        { manifestAppName: 'MyCustomApp', manifestPublisher: 'Electron'} as any);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
-      expect(programOptions).toStrictEqual({ ...defaultExpectedProgramOptions, msix: 'C:\\out\\MyApp.msix' });
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        cert_pass: programOptions.cert_pass,
+        signParams:getDefaultSignParams(programOptions.cert_pass),
+        msix: 'C:\\out\\MyCustomApp.msix' });
     });
 
     it('should use the app name and package arch from the manifest variables if provided', async () => {
-      const packagingOptions: PackagingOptions = {
-        ...minimalPackagingOptions,
-      }
       vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
-      const programOptions = await makeProgramOptions(packagingOptions, { manifestAppName: 'MyApp', manifestPackageArch: 'arm64'} as any);
+      const programOptions = await makeProgramOptions(
+        {
+          ...minimalPackagingOptions,
+          manifestVariables: undefined
+        },
+        { manifestAppName: 'MyApp', manifestPackageArch: 'arm64', manifestPublisher: 'Electron'} as any
+      );
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
-      expect(programOptions).toStrictEqual({ ...defaultExpectedProgramOptions, msix: 'C:\\out\\MyApp_arm64.msix' });
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        cert_pass: programOptions.cert_pass,
+        signParams:getDefaultSignParams(programOptions.cert_pass),
+        msix: 'C:\\out\\MyApp_arm64.msix' });
     });
 
     it('should use the app name and package arch from the manifest variables if provided', async () => {
@@ -829,7 +869,12 @@ describe('utils', () => {
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
-      expect(programOptions).toStrictEqual({ ...defaultExpectedProgramOptions, msix: 'C:\\out\\MySuperApp_arm64.msix' });
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        cert_pass: programOptions.cert_pass,
+        signParams:getDefaultSignParams(programOptions.cert_pass),
+        msix: 'C:\\out\\MySuperApp_arm64.msix'
+      });
     });
 
     it('should disable the creation of the pri file if createPri is false', async () => {
@@ -845,7 +890,11 @@ describe('utils', () => {
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
-      expect(programOptions).toStrictEqual({ ...defaultExpectedProgramOptions, createPri: false });
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        cert_pass: programOptions.cert_pass,
+        signParams:getDefaultSignParams(programOptions.cert_pass),
+        createPri: false });
     });
 
     it('should use the sign params if provided', async () => {
@@ -861,13 +910,18 @@ describe('utils', () => {
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
-      expect(programOptions).toStrictEqual({ ...defaultExpectedProgramOptions, signParams: ['1', '2', '3'], sign: true });
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        cert_pass: programOptions.cert_pass,
+        signParams: ['1', '2', '3'],
+        sign: true });
     });
 
     it('should use cert if provided', async () => {
       const packagingOptions: PackagingOptions = {
         ...minimalPackagingOptions,
         cert: 'C:\\cert.pfx',
+        cert_pass: 'password',
         manifestVariables: {
           targetArch: 'x64',
           publisher: 'Electron',
@@ -878,7 +932,16 @@ describe('utils', () => {
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
-      expect(programOptions).toStrictEqual({ ...defaultExpectedProgramOptions, cert: 'C:\\cert.pfx', cert_pass: undefined, sign: true, signParams: ['-fd', 'sha256', '-f', 'C:\\cert.pfx'] });
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        publisher: 'Electron',
+        cert_pfx: 'C:\\cert.pfx',
+        cert_cer: '',
+        cert_pass: 'password',
+        createDevCert: false,
+        sign: true,
+        signParams: ['-fd', 'sha256', '-f', 'C:\\cert.pfx', '-p', 'password']
+      });
     });
 
     it('should use cert and sign password if provided', async () => {
@@ -895,7 +958,121 @@ describe('utils', () => {
       const programOptions = await makeProgramOptions(packagingOptions);
       // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
       delete programOptions.appManifestIn;
-      expect(programOptions).toStrictEqual({ ...defaultExpectedProgramOptions, cert: 'C:\\cert.pfx', cert_pass: 'password', sign: true, signParams: ['-fd', 'sha256', '-f', 'C:\\cert.pfx', '-p', 'password'] });
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        publisher: 'Electron',
+        cert_pfx: 'C:\\cert.pfx',
+        cert_cer: '',
+        cert_pass: 'password',
+        createDevCert: false,
+        sign: true,
+        signParams: ['-fd', 'sha256', '-f', 'C:\\cert.pfx', '-p', 'password']
+      });
+    });
+
+    it('should set the signtool log level to debug if logLevel is debug', async () => {
+      const packagingOptions: PackagingOptions = {
+        ...minimalPackagingOptions,
+        cert_pass: 'password',
+        cert: 'C:\\cert.pfx',
+        manifestVariables: {
+          targetArch: 'x64',
+          publisher: 'Electron',
+        } as any,
+        logLevel: 'debug',
+      }
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
+      const programOptions = await makeProgramOptions(packagingOptions);
+      // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
+      delete programOptions.appManifestIn;
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        publisher: 'Electron',
+        cert_pfx: 'C:\\cert.pfx',
+        cert_cer: '',
+        cert_pass: 'password',
+        createDevCert: false,
+        sign: true,
+        signParams: ['-fd', 'sha256', '-f', 'C:\\cert.pfx', '-p', 'password', '-debug']
+      });
+    });
+
+    it('should create a dev cert with the provided sign password', async () => {
+      const packagingOptions: PackagingOptions = {
+        ...minimalPackagingOptions,
+        cert_pass: 'password',
+        manifestVariables: {
+          targetArch: 'x64',
+          publisher: 'Electron',
+        } as any
+      }
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
+      const programOptions = await makeProgramOptions(packagingOptions);
+      // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
+      delete programOptions.appManifestIn;
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        publisher: 'Electron',
+        cert_pfx: 'C:\\out\\dev_cert.pfx',
+        cert_cer: 'C:\\out\\dev_cert.cer',
+        cert_pass: 'password',
+        createDevCert: true,
+        signParams: ['-fd', 'sha256', '-f', 'C:\\out\\dev_cert.pfx', '-p', 'password']
+      });
+    });
+
+    it('should use manifest variables publisher if provided', async () => {
+      const packagingOptions: PackagingOptions = {
+        ...incompletePackagingOptions,
+      }
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
+      const programOptions = await makeProgramOptions(packagingOptions, { manifestPublisher: 'MyPublisher' } as any);
+      // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
+      delete programOptions.appManifestIn;
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        msix: 'C:\\out\\app.msix',
+        publisher: 'MyPublisher',
+        cert_pass: programOptions.cert_pass,
+        signParams: getDefaultSignParams(programOptions.cert_pass),
+      });
+    });
+
+    it('should use empty publisher if no publisher is provided', async () => {
+      const packagingOptions: PackagingOptions = {
+        ...incompletePackagingOptions,
+      }
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
+      const programOptions = await makeProgramOptions(packagingOptions, {  } as any);
+      // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
+      delete programOptions.appManifestIn;
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        msix: 'C:\\out\\app.msix',
+        publisher: '',
+        cert_pass: programOptions.cert_pass,
+        signParams: getDefaultSignParams(programOptions.cert_pass),
+      });
+    });
+
+    it('should not sign the package if sign is false', async () => {
+      const packagingOptions: PackagingOptions = {
+        ...minimalPackagingOptions,
+        sign: false,
+      }
+      vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
+      const programOptions = await makeProgramOptions(packagingOptions);
+      // @ts-expect-error: appManifestIn may not be optional in the type, but we want to ignore it for test comparison
+      delete programOptions.appManifestIn;
+      expect(programOptions).toStrictEqual({
+        ...defaultExpectedProgramOptions,
+        publisher: 'Electron',
+        signParams: [],
+        cert_pfx: '',
+        cert_cer: '',
+        createDevCert: false,
+        sign: false,
+      });
     });
   });
 

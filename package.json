@@ -8,7 +8,6 @@
     "prepublish": "npm run build",
     "build": "tsc",
     "test:e2e": "vitest run --config=./test/e2e/vitest.config.ts",
-    "test:e2e:watch": "vitest --config=./test/e2e/vitest.config.ts",
     "test:e2e:coverage": "vitest run --coverage --config=./test/e2e/vitest.config.ts",
     "harness": "tsc & node ./test/testing.js",
     "test:unit": "vitest run --config=./test/unit/vitest.config.ts",
@@ -40,6 +39,7 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "fs-extra": "^11.2.0",
+    "spawn-rx": "^5.1.2",
     "xml-escape": "^1.1.0"
   }
 }

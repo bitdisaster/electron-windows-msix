@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import * as crypto from 'crypto';
 
 import { log } from "./logger";
 import { ManifestVariables, PackagingOptions, ProgramOptions } from "./types";
@@ -83,11 +84,12 @@ export const verifyOptions = async (options: PackagingOptions, manifestVars?: Ma
   if(!(await fs.exists(options.appDir)) && !manifestIsSparsePackage) log.error('Path to application <appDir> does not exist.', true, { appDir: options.appDir });
   if(!options.packageAssets) log.warn('Path to packages assets <packageAssets> not provided, using default assets.');
   if(options.packageAssets && !(await fs.exists(options.packageAssets))) log.error('Path to packages assets provided but <packageAssets> does not exist.', true, { packageAssets: options.packageAssets });
-  if(!options.cert) log.warn('Path to cert <cert> not provided. A dev cert will be created and the package will be signed with it!');
+  if(!options.cert && options.cert_pass) log.warn('Path to cert <cert> not provided. A dev cert will be created with the provided password and the package will be signed with it!');
+  if(!options.cert && !options.cert_pass) log.warn('Path to cert <cert> and cert password <cert_pass> not provided. A dev cert will be created and the package will be signed with it!');
   if(options.cert && !!options.signParams) log.warn('Path to cert <cert> and custom signParams provided. signParams will take priority!');
   if(options.cert && !(await fs.exists(options.cert))) log.error('Path to cert <cert> does not exist.', true, { cert: options.cert });
   if(options.cert && !options.cert_pass) log.warn('Cert cert password <cert_pass> not provided.');
-  if(options.cert) {
+  if(options.cert && options.cert_pass) {
     const certPublisher = await getCertPublisher(options.cert, options.cert_pass);
     if(publisher != certPublisher) log.error('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: publisher, cert_publisher: certPublisher});
   }
@@ -135,8 +137,10 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars?
     log.debug('No WindowsKitVersion provided. Will try AppxManifest.xml min OS version next.');
   }
 
-  if(appManifest) {
-    const { manifestOsMinVersion } = manifestVars;
+  if(appManifest || options.manifestVariables?.packageMinOSVersion) {
+    let { manifestOsMinVersion } = manifestVars || {};
+    manifestOsMinVersion = manifestOsMinVersion || options.manifestVariables?.packageMinOSVersion;
+    log.debug('WindowsKitVersion was derived from OSMinVersion of the AppxManifest. Checking if it exists....', {manifestOsMinVersion});
     if (manifestOsMinVersion) {
       // Older versions than WinKit 10.0.22621.0 for ARM are missing the makeAppx.exe and we will fall back to x64 in that case.
       if(WindowsVersion.IsOlder(manifestOsMinVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
@@ -166,15 +170,32 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars?
   } else {
     log.error('No information on WindowsKitVersion was provided and default WindowsKit path does not exist.', true, windowsKitPathExec);
   }
-
   log.error('Unable to locate MSIX Tooling. Giving up!', true);
 }
 
+/**
+ * Generates a secure random password.
+ * @returns {string} - Generated password.
+ */
+function generatePassword() {
+  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const symbols = '!@#$%^&*()-_=+[]{}<>?,.';
+  const fullCharset = charset + symbols;
+  const length = 16;
+  let password = '';
+  const bytes = crypto.randomBytes(length);
+
+  for (let i = 0; i < length; i++) {
+    password += fullCharset[bytes[i] % fullCharset.length];
+  }
+
+  return password;
+}
 
 export const makeProgramOptions = async (options: PackagingOptions, manifestVars?: ManifestVariables) => {
   const { makeAppx, makePri, signTool, makeCert} = await locateMSIXTooling(options, manifestVars);
   const { outputDir, layoutDir } = await ensureFolders(options);
-  const { manifestAppName, manifestPackageArch, manifestIsSparsePackage } = manifestVars || {};
+  const { manifestAppName, manifestPackageArch, manifestIsSparsePackage, manifestPublisher } = manifestVars || {};
   const appName = manifestAppName || removeFileExtension(options.manifestVariables?.appExecutable) || 'app';
   const packageArch = manifestPackageArch || options.manifestVariables?.targetArch;
   const isSparsePackage = manifestIsSparsePackage || false;
@@ -186,21 +207,40 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
   const priConfig = path.join(layoutDir, 'priconfig.xml');
   const priFile =  path.join(layoutDir, 'resources.pri');
   const createPri = options.createPri !== undefined ? options.createPri : true;
-  let signParams: Array<string> = undefined;
-  if(options.signParams && options.signParams.length > 0) {
-    signParams = options.signParams;
-  } else if (options.cert) {
-    signParams = [
-      '-fd',
-      'sha256',
-      '-f',
-      options.cert,
-    ];
-    if (options.cert_pass) {
-      signParams.push('-p', options.cert_pass);
+  const publisher = options.manifestVariables?.publisher || manifestPublisher || '';
+  const sign = options.sign !== undefined ? options.sign : true;
+  let cert_pfx = options.cert || '';
+  let cert_cer = "";
+  let cert_pass = options.cert_pass;
+  const createDevCert = !options.cert && sign;
+  let signParams: Array<string> = [];
+  if(sign) {
+    if(createDevCert) {
+      cert_pfx = path.join(outputDir, 'dev_cert.pfx');
+      cert_cer = path.join(outputDir, 'dev_cert.cer');
+      if(!cert_pass) {
+        cert_pass = generatePassword();
+      }
+    }
+
+    if(options.signParams && options.signParams.length > 0) {
+      signParams = options.signParams;
+    } else {
+      signParams = [
+        '-fd',
+        'sha256',
+        '-f',
+        cert_pfx,
+        '-p',
+        cert_pass
+      ];
+    }
+
+    if(options.logLevel === 'debug') {
+      signParams.push('-debug');
     }
   }
-  const sign = !!signParams;
+
   const appManifestIn = await manifest(options);
 
   const program: ProgramOptions = {
@@ -217,14 +257,17 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
     appManifestLayout,
     assetsIn: options.packageAssets || path.join(__dirname, '..', 'static', 'assets'),
     assetsLayout,
-    cert: options.cert,
-    cert_pass: options.cert_pass,
+    cert_pfx,
+    cert_cer,
+    cert_pass: cert_pass || '',
     priConfig,
     priFile,
     createPri,
     isSparsePackage,
     signParams,
     sign,
+    createDevCert,
+    publisher,
   }
 
   log.debug('Program options', program);

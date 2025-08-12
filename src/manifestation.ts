@@ -11,7 +11,7 @@ const DEFAULT_OS_VERSION = '10.0.14393.0';
 const DEFAULT_BACKGROUND_COLOR = 'transparent';
 
 const getTemplate = () => {
-  const content = fs.readFileSync(path.join(__dirname, `../static/AppxManifest.in`), 'utf-8');
+  const content = fs.readFileSync(path.join(__dirname, `../static/templates/AppxManifest.xml.in`), 'utf-8');
   return content;
 };
 
@@ -103,7 +103,7 @@ export const manifest = async (options: PackagingOptions) => {
     .replace(/{{IdentityName}}/g, packageIdentity)
     .replace(/{{AppDisplayName}}/g, appDisplayName || packageDisplayName || appName)
     .replace(/{{MinOSVersion}}/g, packageMinOSVersion || DEFAULT_OS_VERSION)
-    .replace(/{{MaxOSVersionTested}}/g, packageMaxOSVersionTested || DEFAULT_OS_VERSION)
+    .replace(/{{MaxOSVersionTested}}/g, packageMaxOSVersionTested || packageMinOSVersion || DEFAULT_OS_VERSION)
     .replace(/{{Version}}/g, packageVersion)
     .replace(/{{DisplayName}}/g, packageDisplayName || appDisplayName || appName)
     .replace(/{{PublisherName}}/g, publisherName)

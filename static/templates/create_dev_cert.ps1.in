@@ -1,0 +1,47 @@
+
+# Customize these values
+$subjectName = 'CN={{SubjectName}}'
+$friendlyName = 'ELECTRON WINDOWS MSIX Dev Cert ($subjectName)'
+$yearsValid = 99
+$pfxPasswordPlain = '{{Password}}' # Use a strong password
+$pfxOutputPath = '{{PfxOutputPath}}'
+$cerOutputPath = '{{CerOutputPath}}'
+$hasPassword = $pfxPasswordPlain -ne ""
+
+# Convert password to SecureString
+if ($hasPassword) {
+  $pfxPassword = ConvertTo-SecureString -String $pfxPasswordPlain -Force -AsPlainText
+}
+
+
+
+# Look for existing cert with matching subject and friendly name
+$existingCert = Get-ChildItem -Path "cert:\CurrentUser\My" |
+    Where-Object {
+        $_.Subject -eq $subjectName -and $_.FriendlyName -eq $friendlyName
+    }
+
+if ($existingCert) {
+  $cert = $existingCert | Sort-Object NotAfter -Descending | Select-Object -First 1
+} else {
+  # Generate self-signed cert with private key (exportable)
+  $cert = New-SelfSignedCertificate `
+    -FriendlyName $friendlyName `
+    -DnsName "electron.windows.msix.dev" `
+    -Subject $subjectName `
+    -KeyExportPolicy Exportable `
+    -KeyLength 2048 `
+    -KeyUsage DigitalSignature `
+    -Type CodeSigning `
+    -KeySpec Signature `
+    -NotAfter (Get-Date).AddYears($yearsValid) `
+    -CertStoreLocation "cert:\CurrentUser\My"
+}
+
+# Export public certificate (.cer)
+Export-Certificate -Cert $cert -FilePath $cerOutputPath | Out-Null
+
+# Export private certificate with password (.pfx)
+if ($hasPassword) {
+  Export-PfxCertificate -Cert $cert -FilePath $pfxOutputPath -Password $pfxPassword | Out-Null
+}

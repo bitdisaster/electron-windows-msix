@@ -95,6 +95,11 @@ export interface PackagingOptions {
   /** Indicates whether to create Pri resource files. It will be enabled by default. */
   createPri ? : boolean;
   /**
+   * Indicates whether to sign the MSIX package. It will be enabled by default. If cert or signParams are not provided then the package will be signed with a dev cert.
+   * If sign is false then the package will not be signed.
+   */
+  sign ? : boolean;
+  /**
    * An optional path to the certificate. If not provided then the MSIX will not be signed. Beware that the Publisher of the cert
    * must match the AppxManifest Publisher.
    */
@@ -127,7 +132,8 @@ export interface ProgramOptions {
   appManifestLayout: string;
   assetsIn: string;
   assetsLayout: string;
-  cert: string;
+  cert_pfx: string;
+  cert_cer: string;
   cert_pass: string;
   createPri: boolean;
   priConfig: string;
@@ -135,6 +141,8 @@ export interface ProgramOptions {
   isSparsePackage: boolean;
   signParams: Array<string>;
   sign: boolean;
+  createDevCert: boolean;
+  publisher: string;
 }
 
 

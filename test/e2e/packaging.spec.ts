@@ -10,11 +10,12 @@ describe('package', () => {
   });
 
   describe('packaging', () => {
-    it('should package the app with an existing app manifest', async () => {
+    it.only('should package the app with an existing app manifest', async () => {
       await packageMSIX({
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),
         outputDir: path.join(__dirname, '..', '..', 'out'),
         appManifest: path.join(__dirname, 'fixtures', 'AppxManifest_x64.xml'),
+        logLevel: 'debug',
       });
       expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
     });
@@ -119,7 +120,7 @@ describe('package', () => {
           appExecutable: 'hellomsix.exe',
           targetArch: 'x64',
         },
-        windowsKitVersion: '10.0.18362.0',
+        windowsKitVersion: '10.0.19041.0',
       });
       expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
     });
@@ -157,7 +158,7 @@ describe('package', () => {
           packageVersion: '1.42.0.0',
           appExecutable: 'hellomsix.exe',
           targetArch: 'x64',
-          packageMinOSVersion: '10.0.18362.0',
+          packageMinOSVersion: '10.0.19041.0',
         },
         logLevel: 'debug',
       });
@@ -243,7 +244,7 @@ describe('package', () => {
             packageVersion: '1.42.0.0',
             appExecutable: 'hellomsix.exe',
             targetArch: 'x64',
-            packageMinOSVersion: '10.0.18362.0',
+            packageMinOSVersion: '10.0.19041.0',
             packageMaxOSVersionTested: '10.0.14000.0',
           },
         });

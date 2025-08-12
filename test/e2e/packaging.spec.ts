@@ -119,7 +119,7 @@ describe('package', () => {
           appExecutable: 'hellomsix.exe',
           targetArch: 'x64',
         },
-        windowsKitVersion: '10.0.18362.0',
+        windowsKitVersion: '10.0.19041.0',
       });
       expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
     });
@@ -157,7 +157,7 @@ describe('package', () => {
           packageVersion: '1.42.0.0',
           appExecutable: 'hellomsix.exe',
           targetArch: 'x64',
-          packageMinOSVersion: '10.0.18362.0',
+          packageMinOSVersion: '10.0.19041.0',
         },
         logLevel: 'debug',
       });
@@ -243,7 +243,7 @@ describe('package', () => {
             packageVersion: '1.42.0.0',
             appExecutable: 'hellomsix.exe',
             targetArch: 'x64',
-            packageMinOSVersion: '10.0.18362.0',
+            packageMinOSVersion: '10.0.19041.0',
             packageMaxOSVersionTested: '10.0.14000.0',
           },
         });

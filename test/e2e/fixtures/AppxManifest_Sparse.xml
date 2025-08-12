@@ -7,13 +7,13 @@
          xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
          xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
          IgnorableNamespaces="uap uap2 uap3 rescap desktop uap10">
-    <Identity Name="Electron.20.0.Sparse"
+    <Identity Name="hellomsix.Sparse"
               Publisher="CN=Electron MSIX"
               ProcessorArchitecture="x64"
-              Version="1.0.0.0" />
+              Version="1.2.3.4" />
     <Properties>
-        <DisplayName>Electron Sparse App</DisplayName>
-        <PublisherDisplayName>Electron Sparse</PublisherDisplayName>
+        <DisplayName>hellomsix Sparse App</DisplayName>
+        <PublisherDisplayName>hellomsix Sparse</PublisherDisplayName>
         <Logo>assets\StoreLogo.png</Logo>
         <uap10:AllowExternalContent>true</uap10:AllowExternalContent>
     </Properties>
@@ -27,7 +27,7 @@
     </Resources>
     <Applications>
         <Application Id="Electron"
-                     Executable="Electron.exe"
+                     Executable="hellomsix.exe"
                      uap10:TrustLevel="mediumIL"
                      uap10:RuntimeBehavior="win32App">
             <uap:VisualElements DisplayName="Electron Sparse App"

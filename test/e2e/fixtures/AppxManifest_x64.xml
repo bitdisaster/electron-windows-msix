@@ -9,7 +9,7 @@
   IgnorableNamespaces="uap uap3 desktop2">
 <Identity Name="Electron.MySuite.HelloMSIX"
           ProcessorArchitecture="x64"
-          Version="1.0.0.0"
+          Version="1.2.3.4"
           Publisher="CN=Electron MSIX"/>
   <Properties>
     <DisplayName>HelloMSIX App</DisplayName>

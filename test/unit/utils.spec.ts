@@ -192,6 +192,17 @@ describe('utils', () => {
         expect(log.error).toHaveBeenCalledWith('Neither package version <packageVersion> nor app manifest <appManifest> provided.', true);
       });
 
+      it('should throw an error if package version is not a valid version', async () => {
+        const packagingOptions: PackagingOptions = {
+          ...incompletePackagingOptions,
+          manifestVariables: {
+            packageVersion: 'not a version',
+          } as any
+        }
+        await verifyOptions(packagingOptions);
+        expect(log.error).toHaveBeenCalledWith('Package version <packageVersion> is not a semantic version.', true, { packageVersion: 'not a version' });
+      });
+
       it('should throw an error if no publisher is provided', async () => {
         const packagingOptions: PackagingOptions = {
           ...incompletePackagingOptions,
@@ -863,6 +874,7 @@ describe('utils', () => {
           targetArch: 'arm64',
           publisher: 'Electron',
           appExecutable: 'MySuperApp.exe',
+          packageVersion: '1.2.3',
         } as any
       }
       vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
@@ -883,6 +895,7 @@ describe('utils', () => {
         manifestVariables: {
           targetArch: 'x64',
           publisher: 'Electron',
+          packageVersion: '1.2.3',
         } as any,
         createPri: false,
       }
@@ -904,6 +917,7 @@ describe('utils', () => {
         manifestVariables: {
           targetArch: 'x64',
           publisher: 'Electron',
+          packageVersion: '1.2.3',
         } as any
       }
       vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
@@ -925,6 +939,7 @@ describe('utils', () => {
         manifestVariables: {
           targetArch: 'x64',
           publisher: 'Electron',
+          packageVersion: '1.2.3',
         } as any
       }
       vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
@@ -952,6 +967,7 @@ describe('utils', () => {
         manifestVariables: {
           targetArch: 'x64',
           publisher: 'Electron',
+          packageVersion: '1.2.3',
         } as any
       }
       vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);
@@ -978,6 +994,7 @@ describe('utils', () => {
         manifestVariables: {
           targetArch: 'x64',
           publisher: 'Electron',
+          packageVersion: '1.2.3',
         } as any,
         logLevel: 'debug',
       }
@@ -1004,6 +1021,7 @@ describe('utils', () => {
         manifestVariables: {
           targetArch: 'x64',
           publisher: 'Electron',
+          packageVersion: '1.2.3',
         } as any
       }
       vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any);

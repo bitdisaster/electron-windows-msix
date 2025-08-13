@@ -5,7 +5,7 @@ import * as crypto from 'crypto';
 import { log } from "./logger";
 import { ManifestVariables, PackagingOptions, ProgramOptions } from "./types";
 import { getCertPublisher } from './msix';
-import { WindowsVersion } from './win-version';
+import { isValidVersion, WindowsOSVersion } from './win-version';
 import { manifest } from './manifestation';
 
 const MIN_ARM_WIN_KIT_VERSION = '10.0.22621.0';
@@ -65,6 +65,7 @@ export const verifyOptions = async (options: PackagingOptions, manifestVars?: Ma
   log.debug('You are calling with following packaging options', options)
   if(!options.appManifest && options.manifestVariables) {
     if(!options.manifestVariables.packageVersion) log.error('Neither package version <packageVersion> nor app manifest <appManifest> provided.', true);
+    if(!isValidVersion(options.manifestVariables.packageVersion)) log.error('Package version <packageVersion> is not a semantic version.', true, { packageVersion: options.manifestVariables.packageVersion });
     if(!options.manifestVariables.publisher) log.error('Neither publisher <publisher> nor app manifest <appManifest> provided.', true);
     if(!options.manifestVariables.publisherDisplayName) log.warn('Neither publisher display name <publisherDisplayName> nor app manifest <appManifest> provided. Using publisher as display name.');
     if(!options.manifestVariables.packageDisplayName) log.warn('Neither package display name <packageDisplayName> nor app manifest <appManifest> provided. Using app executable as display name.');
@@ -120,7 +121,7 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars?
 
   if(windowsKitVersion) {
     // Older versions than WinKit 10.0.22621.0 for ARM are missing the makeAppx.exe and we will fall back to x64 in that case.
-    if(WindowsVersion.IsOlder(windowsKitVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
+    if(WindowsOSVersion.IsOlder(windowsKitVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
       arch = 'x64';
     }
     log.debug('WindowsKitVersion was provided and takes priority over AppxManifest. Checking if it exists....', {windowsKitVersion});
@@ -143,7 +144,7 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars?
     log.debug('WindowsKitVersion was derived from OSMinVersion of the AppxManifest. Checking if it exists....', {manifestOsMinVersion});
     if (manifestOsMinVersion) {
       // Older versions than WinKit 10.0.22621.0 for ARM are missing the makeAppx.exe and we will fall back to x64 in that case.
-      if(WindowsVersion.IsOlder(manifestOsMinVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
+      if(WindowsOSVersion.IsOlder(manifestOsMinVersion, MIN_ARM_WIN_KIT_VERSION) && arch === 'arm64') {
         arch = 'x64';
       }
       log.debug('WindowsKitVersion was derived from OSMinVersion of the AppxManifest. Checking if it exists....', {windowsKitVersion});

@@ -6,6 +6,7 @@ import {
 } from "./types";
 import { removeFileExtension, removePublisherPrefix } from "./utils";
 import { log } from "./logger";
+import { ensureWindowsVersion } from "./win-version";
 
 const DEFAULT_OS_VERSION = '10.0.14393.0';
 const DEFAULT_BACKGROUND_COLOR = 'transparent';
@@ -99,12 +100,13 @@ export const manifest = async (options: PackagingOptions) => {
   } = options.manifestVariables;
   const appName = removeFileExtension(appExecutable);
   const publisherName = removePublisherPrefix(publisher);
+  const version = ensureWindowsVersion(packageVersion);
   const manifest = template
     .replace(/{{IdentityName}}/g, packageIdentity)
     .replace(/{{AppDisplayName}}/g, appDisplayName || packageDisplayName || appName)
     .replace(/{{MinOSVersion}}/g, packageMinOSVersion || DEFAULT_OS_VERSION)
     .replace(/{{MaxOSVersionTested}}/g, packageMaxOSVersionTested || packageMinOSVersion || DEFAULT_OS_VERSION)
-    .replace(/{{Version}}/g, packageVersion)
+    .replace(/{{Version}}/g, version)
     .replace(/{{DisplayName}}/g, packageDisplayName || appDisplayName || appName)
     .replace(/{{PublisherName}}/g, publisherName)
     .replace(/{{PublisherDisplayName}}/g, publisherDisplayName || publisherName)

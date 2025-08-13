@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { describe, it, expect, beforeAll } from "vitest";
 import path from "path";
 import { packageMSIX } from "../../src";
-import { getCertStatus, getCertSubject, installDevCert } from './utils/cert';
+import { getCertStatus, installDevCert } from './utils/cert';
 
 describe('package', () => {
   beforeAll(async () => {
@@ -10,7 +10,7 @@ describe('package', () => {
   });
 
   describe('packaging', () => {
-    it.only('should package the app with an existing app manifest', async () => {
+    it('should package the app with an existing app manifest', async () => {
       await packageMSIX({
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),
         outputDir: path.join(__dirname, '..', '..', 'out'),
@@ -33,6 +33,29 @@ describe('package', () => {
           packageBackgroundColor: '#000000',
           packageIdentity: 'com.example.app',
           packageVersion: '1.42.0.0',
+          appExecutable: 'hellomsix.exe',
+          targetArch: 'x64',
+          packageMinOSVersion: '10.0.19041.0',
+          packageMaxOSVersionTested: '10.0.19041.0',
+        },
+        windowsKitVersion: '10.0.19041.0',
+      });
+      expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
+    });
+
+    it('should package the app with prerelease version manifest variables', async () => {
+      await packageMSIX({
+        appDir: path.join(__dirname, 'fixtures', 'app-x64'),
+        outputDir: path.join(__dirname, '..', '..', 'out'),
+        manifestVariables: {
+          appDisplayName: 'Hello MSIX',
+          publisher: 'CN=Dev Publisher',
+          publisherDisplayName: 'Dev Publisher',
+          packageDisplayName: 'Hello MSIX',
+          packageDescription: 'Just a test app',
+          packageBackgroundColor: '#000000',
+          packageIdentity: 'com.example.app',
+          packageVersion: '1.42.0-alpha',
           appExecutable: 'hellomsix.exe',
           targetArch: 'x64',
           packageMinOSVersion: '10.0.19041.0',

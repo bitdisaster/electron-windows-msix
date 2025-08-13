@@ -45,13 +45,14 @@ const { packageMSIX } = require("../lib/index");
 // });
 
 packageMSIX({
-  appDir:  path.join(__dirname, '..\\test\\fixtures\\app-x64'),
+  appDir:  path.join(__dirname, '..\\test\\e2e\\fixtures\\app-x64'),
   manifestVariables: {
     publisher: 'Jan Hannemann',
     packageIdentity: 'com.electron.myapp',
-    packageVersion: '1.42.0.0',
+    packageVersion: '1.42.0',
     appExecutable: 'HelloMSIX.exe',
     targetArch: 'x64',
+    packageMinOSVersion: '10.0.19041.0',
   },
   outputDir: path.join(__dirname, '..\\out'),
 });

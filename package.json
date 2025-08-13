@@ -9,7 +9,7 @@
     "build": "tsc",
     "test:e2e": "vitest run --config=./test/e2e/vitest.config.ts",
     "test:e2e:coverage": "vitest run --coverage --config=./test/e2e/vitest.config.ts",
-    "harness": "tsc & node ./test/testing.js",
+    "harness": "tsc & node ./harness/testing.js",
     "test:unit": "vitest run --config=./test/unit/vitest.config.ts",
     "test:unit:watch": "vitest --config=./test/unit/vitest.config.ts",
     "test:unit:coverage": "vitest run --coverage --config=./test/unit/vitest.config.ts"

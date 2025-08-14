@@ -3,3 +3,4 @@ src/
 test/
 harness/
 out/
+coverage/

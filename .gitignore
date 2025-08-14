@@ -2,3 +2,4 @@
 out
 yarn-error.log
 lib
+coverage

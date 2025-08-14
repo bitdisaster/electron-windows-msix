@@ -22,6 +22,7 @@ npm install electron-windows-msix
 
   appDir            - The folder containing the packaged Electron App
   appManifest       - The AppManifest.xml containing necessary declarations to build the MSIX
+  manifestVariables - Optional manifest variables to generate a manifest if manifest file is not provided
   packageAssets     - Required assets declared in AppManifest.xml. E.g. icons and tile images
   outputDir         - The output directory for the finished MSIX package.
   packageName       - Optional name for the finished MSIX package. If not provided a name will be derived from AppManifest.xml.
@@ -33,35 +34,107 @@ npm install electron-windows-msix
                       must match the AppxManifest Publisher.
   cert_pass         - Optionally the password for the cert.
   signParams        - Optionally an explicit set parameter for the SignTool. If present it will supersede the cert an cert_pass parameter.
+  sign              - Optional parameter that indicates whether the MSIX should be signed. True by default.
   logLevel          - Optional log level. By default the module will be silent. The 'warn' level will give heads up on irregularities.
                       The 'debug' level will give extensive output to identify problems with the module.
 ```
 
-#### Minimal example that derives all possible data from the Manifest
-```js
-packageMSIX({
-    appDir: 'C:\\temp\\myapp',
-    appManifest: 'C:\\temp\\AppxManifest.xml',
-    packageAssets: 'C:\\temp\\assets',
-    outputDir: 'C:\\temp\\out',
-    cert: 'C:\\temp\\app_cert.pfx',
-    cert_pass: 'hellomsix',
+```
+MANIFEST GENERATION VARIABLES
+
+packageIdentity           - The identity of the MSIX package.
+publisher                 - The publisher of the MSIX package. This will also  be used to create a dev certificate if one is
+publisherDisplayName      - The display name of the publisher of the MSIX package.
+packageVersion            - The version of the MSIX package. Semantic version can be used. However, pre-release version will be converted to valid Windows versions .
+packageDisplayName        - The display name of the MSIX package. This will be used to set the DisplayName attribute in the AppxManifest.xml.
+packageDescription        - The description of the MSIX package. This will be used to set the Description attribute in the AppxManifest.xml.
+packageBackgroundColor    - The background color of the MSIX package. This will be used to set the BackgroundColor attribute in the VisualElements element in theAppxManifest.xml.
+appExecutable             - The executable of the MSIX package. This will be used to set the Executable attribute in the AppxManifest.xml.
+appDisplayName            - The name of the MSIX package. This will be used to set the DisplayName attribute in the VisualElements element in the AppxManifest.xml.
+targetArch                - The target architecture of the MSIX package. This will be used to set the ProcessorArchitecture attribute in the AppxManifest.xml. 'x64' |'arm64' | 'x86' | 'arm' | '*';
+packageMinOSVersion       - The minimum OS version the MSIX package requires. This will be used to set the MinVersion attribute in the TargetDeviceFamily element in theAppxManifest.xml.
+packageMaxOSVersionTested - The maximum OS version the MSIX package has been tested on. This will be used to set the MaxVersionTested attribute in the TargetDeviceFamily element in the AppxManifest.xml.
+```
+
+#### Minimal example that creates a manifest and a dev cert
+```ts
+import { packageMSIX } from "electron-windows-msix";
+
+await packageMSIX({
+  appDir: 'C:\\temp\\myapp',
+  outputDir: 'C:\\temp\\out',
+  manifestVariables: {
+    publisher: 'CN=Dev Publisher',
+    packageIdentity: 'com.example.app',
+    packageVersion: '1.42.0.0',
+    appExecutable: 'hellomsix.exe',
+    targetArch: 'x64',
+  },
 });
 ```
 
-#### Explicit example that controls all options
+#### Minimal example that derives all possible data from the Manifest
+```ts
+import { packageMSIX } from "electron-windows-msix";
+
+await packageMSIX({
+  appDir: 'C:\\temp\\myapp',
+  appManifest: 'C:\\temp\\AppxManifest.xml',
+  packageAssets: 'C:\\temp\\assets',
+  outputDir: 'C:\\temp\\out',
+  cert: 'C:\\temp\\app_cert.pfx',
+  cert_pass: 'hellomsix',
+});
+```
+
+#### Example that controls all options with via manifest varaibles
 ```js
-packageMSIX({
-    appDir: 'C:\\temp\\myapp',
-    appManifest: 'C:\\temp\\AppxManifest.xml',
-    packageAssets: 'C:\\temp\\assets',
-    outputDir: 'C:\\temp\\out',
-    windowsKitPath: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x64',
-    createPri: false,
-    cert: 'C:\\temp\\app_cert.pfx',
-    cert_pass: 'hellomsix',
-    packageName: 'MyApp.msix',
-    logLevel: 'warn',
+import { packageMSIX } from "electron-windows-msix";
+
+await packageMSIX({
+  appDir: 'C:\\temp\\myapp',
+  packageAssets: 'C:\\temp\\assets',
+  outputDir: 'C:\\temp\\out',
+  manifestVariables: {
+    appDisplayName: 'Hello MSIX',
+    publisher: 'CN=Dev Publisher',
+    publisherDisplayName: 'Dev Publisher',
+    packageDisplayName: 'Hello MSIX',
+    packageDescription: 'Just a test app',
+    packageBackgroundColor: '#000000',
+    packageIdentity: 'com.example.app',
+    packageVersion: '1.42.0.0',
+    appExecutable: 'hellomsix.exe',
+    targetArch: 'x64',
+    packageMinOSVersion: '10.0.19041.0',
+    packageMaxOSVersionTested: '10.0.19041.0',
+  },
+  windowsKitPath: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\19041\\x64',
+  createPri: true,
+  cert: 'C:\\temp\\app_cert.pfx',
+  cert_pass: 'hellomsix',
+  packageName: 'MyApp.msix',
+  logLevel: 'warn',
+  sign: true
+});
+```
+
+#### Example that controls all options with an existing manifest
+```ts
+import { packageMSIX } from "electron-windows-msix";
+
+await packageMSIX({
+  appDir: 'C:\\temp\\myapp',
+  appManifest: 'C:\\temp\\AppxManifest.xml',
+  packageAssets: 'C:\\temp\\assets',
+  outputDir: 'C:\\temp\\out',
+  windowsKitPath: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x64',
+  createPri: true,
+  cert: 'C:\\temp\\app_cert.pfx',
+  cert_pass: 'hellomsix',
+  packageName: 'MyApp.msix',
+  logLevel: 'warn',
+  sign: true
 });
 ```
 

@@ -43,19 +43,24 @@ const { packageMSIX } = require("../lib/index");
 //   packageName: 'com.electron.myapp.msix',
 //   logLevel: 'warn'
 // });
+const main = async () => {
+  const artifacts = await packageMSIX({
+    appDir:  path.join(__dirname, '\\..\\test\\e2e\\fixtures\\app-x64'),
+    manifestVariables: {
+      publisher: 'Jan Hannemann',
+      packageIdentity: 'com.electron.myapp',
+      packageVersion: '1.42.0',
+      appExecutable: 'HelloMSIX.exe',
+      targetArch: 'x64',
+      packageMinOSVersion: '10.0.19041.0',
+    },
+    outputDir: path.join(__dirname, '..\\..\\out'),
+  });
 
-packageMSIX({
-  appDir:  path.join(__dirname, '..\\test\\e2e\\fixtures\\app-x64'),
-  manifestVariables: {
-    publisher: 'Jan Hannemann',
-    packageIdentity: 'com.electron.myapp',
-    packageVersion: '1.42.0',
-    appExecutable: 'HelloMSIX.exe',
-    targetArch: 'x64',
-    packageMinOSVersion: '10.0.19041.0',
-  },
-  outputDir: path.join(__dirname, '..\\out'),
-});
+  console.log(artifacts);
+}
+
+main();
 
 // packageMSIX({
 //     appDir:  path.join(__dirname, '..\\test\\fixtures\\app-arm64'),

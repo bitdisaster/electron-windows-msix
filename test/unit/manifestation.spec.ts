@@ -112,7 +112,7 @@ describe('manifestation', () => {
       expect(appManifestIn).toMatch(/<PublisherDisplayName>Jan Hannemann<\/PublisherDisplayName>/);
       expect(appManifestIn).toMatch(/<Logo>assets\\icon.png<\/Logo>/);
       expect(appManifestIn).toMatch(/<TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.14393.0" MaxVersionTested="10.0.14393.0" \/>/);
-      expect(appManifestIn).toMatch(/<Application Id="HelloMSIX.exe"  Executable="app\\HelloMSIX.exe" EntryPoint="Windows.FullTrustApplication">/);
+      expect(appManifestIn).toMatch(/<Application Id="App"  Executable="app\\HelloMSIX.exe" EntryPoint="Windows.FullTrustApplication">/);
       expect(appManifestIn).toMatch(/DisplayName="HelloMSIX"/);
       expect(appManifestIn).toMatch(/Description="HelloMSIX"/);
       expect(appManifestIn).toMatch(/Square44x44Logo="assets\\Square44x44Logo.png"/);

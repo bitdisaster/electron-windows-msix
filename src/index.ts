@@ -4,7 +4,7 @@ import { make, pri, priConfig, sign } from './msix';
 import { Artifacts, ManifestGenerationVariables, PackagingOptions } from './types';
 import { createLayout, ensureFolders, makeProgramOptions, setLogLevel, verifyOptions } from './utils';
 
-export { PackagingOptions, ManifestGenerationVariables, Artifacts };
+export type { PackagingOptions, ManifestGenerationVariables, Artifacts };
 
 export const packageMSIX = async (options: PackagingOptions) => {
   setLogLevel(options);
@@ -20,4 +20,9 @@ export const packageMSIX = async (options: PackagingOptions) => {
   if(program.sign) {
     await sign(program);
   }
+
+  return {
+    msixPackage: program.msix,
+    certificate: program.cert_pfx,
+  };
 }

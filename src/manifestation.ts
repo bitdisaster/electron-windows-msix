@@ -5,7 +5,6 @@ import {
   PackagingOptions
 } from "./types";
 import { removeFileExtension, removePublisherPrefix } from "./utils";
-import { log } from "./logger";
 import { ensureWindowsVersion } from "./win-version";
 
 const DEFAULT_OS_VERSION = '10.0.14393.0';

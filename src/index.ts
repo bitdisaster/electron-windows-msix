@@ -1,8 +1,10 @@
 import { ensureDevCert } from './cert';
 import { getManifestVariables } from './manifestation';
 import { make, pri, priConfig, sign } from './msix';
-import { PackagingOptions } from './types';
+import { Artifacts, ManifestGenerationVariables, PackagingOptions } from './types';
 import { createLayout, ensureFolders, makeProgramOptions, setLogLevel, verifyOptions } from './utils';
+
+export { PackagingOptions, ManifestGenerationVariables, Artifacts };
 
 export const packageMSIX = async (options: PackagingOptions) => {
   setLogLevel(options);

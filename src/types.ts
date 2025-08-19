@@ -156,3 +156,8 @@ export type ManifestVariables = {
   manifestIsSparsePackage: boolean,
   manifestPublisher: string
 }
+
+export interface Artifacts {
+  msixPackage: string;
+  certificate: string;
+}

@@ -27,7 +27,7 @@
     <Capability Name="internetClient" />
   </Capabilities>
   <Applications>
-    <Application Id="{{AppExecutable}}"  Executable="app\{{AppExecutable}}" EntryPoint="Windows.FullTrustApplication">
+    <Application Id="App"  Executable="app\{{AppExecutable}}" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
           DisplayName="{{AppDisplayName}}"
           Description="{{PackageDescription}}"

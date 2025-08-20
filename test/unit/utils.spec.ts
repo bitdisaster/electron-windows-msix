@@ -771,10 +771,10 @@ describe('utils', () => {
       vi.mocked(fs.pathExists).mockResolvedValueOnce(true as any)
       const binaries = await locateMSIXTooling(packagingOptions);
       expect(binaries).toStrictEqual({
-        makeAppx: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\arm64\\makeappx.exe',
-        makePri: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\arm64\\makepri.exe',
-        makeCert: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\arm64\\makecert.exe',
-        signTool: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\arm64\\SignTool.exe'});
+        makeAppx: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\arm64\\makeappx.exe',
+        makePri: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\arm64\\makepri.exe',
+        makeCert: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\arm64\\makecert.exe',
+        signTool: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\arm64\\SignTool.exe'});
     });
 
     it('should throw an error if no binaries are found', async () => {
@@ -783,7 +783,7 @@ describe('utils', () => {
       }
       vi.mocked(fs.pathExists).mockResolvedValueOnce(false as any)
       await locateMSIXTooling(packagingOptions);
-      expect(log.error).toHaveBeenCalledWith('No information on WindowsKitVersion was provided and default WindowsKit path does not exist.', true, 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64');
+      expect(log.error).toHaveBeenCalledWith('No information on WindowsKitVersion was provided and default WindowsKit path does not exist.', true, 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64');
     });
 
   });
@@ -792,10 +792,10 @@ describe('utils', () => {
     const defaultExpectedProgramOptions: ProgramOptions = {
       appDir: 'C:\\app',
       assetsIn: path.join(__dirname, '..', '..', 'static', 'assets'),
-      makeMsix: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64\\makeappx.exe',
-      makePri: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64\\makepri.exe',
-      makeCert: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64\\makecert.exe',
-      signTool: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x64\\SignTool.exe',
+      makeMsix: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\makeappx.exe',
+      makePri: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\makepri.exe',
+      makeCert: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\makecert.exe',
+      signTool: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\SignTool.exe',
       outputDir: 'C:\\out',
       layoutDir: 'C:\\out\\msix_layout',
       msix: 'C:\\out\\app_x64.msix',

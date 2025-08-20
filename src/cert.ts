@@ -3,8 +3,10 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { powershell } from './powershell';
 import { removePublisherPrefix } from './utils';
+import { log } from './logger';
 
 export const ensureDevCert = async (programOptions: ProgramOptions) => {
+  log.debug('Creating dev cert');
   if(programOptions.createDevCert) {
     const template = fs.readFileSync(
       path.join(__dirname, '../static/templates/create_dev_cert.ps1.in'),
@@ -19,7 +21,8 @@ export const ensureDevCert = async (programOptions: ProgramOptions) => {
 
     const scriptPath = path.join(programOptions.outputDir, 'create_dev_cert.ps1');
     fs.writeFileSync(scriptPath, script);
-    await powershell(scriptPath);
+    const result = await powershell(scriptPath);
+    log.debug('Dev cert script result', result);
     fs.unlinkSync(scriptPath);
   }
 }

@@ -39,9 +39,9 @@ if ($existingCert) {
 }
 
 # Export public certificate (.cer)
-Export-Certificate -Cert $cert -FilePath $cerOutputPath | Out-Null
+Export-Certificate -Cert $cert -FilePath $cerOutputPath
 
 # Export private certificate with password (.pfx)
 if ($hasPassword) {
-  Export-PfxCertificate -Cert $cert -FilePath $pfxOutputPath -Password $pfxPassword | Out-Null
+  Export-PfxCertificate -Cert $cert -FilePath $pfxOutputPath -Password $pfxPassword
 }

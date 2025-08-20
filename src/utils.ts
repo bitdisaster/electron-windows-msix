@@ -8,6 +8,7 @@ import { getCertPublisher } from './msix';
 import { isValidVersion, WindowsOSVersion } from './win-version';
 import { manifest } from './manifestation';
 
+const DEFAULT_WIN_KIT_VERSION = '10.0.26100.0';
 const MIN_ARM_WIN_KIT_VERSION = '10.0.22621.0';
 const WIN_KIT_BIN_PATH = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin';
 const MAKE_PRI_EXE = 'makepri.exe';
@@ -163,7 +164,7 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars?
   }
 
   log.debug('No information on WindowsKitVersion was provided, using default binaries. Checking if it exists....', {windowsKitVersion});
-  const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, arch);
+  const windowsKitPathExec = path.join(WIN_KIT_BIN_PATH, DEFAULT_WIN_KIT_VERSION, arch);
   if(await fs.pathExists(windowsKitPathExec)) {
     const binaries = await getBinaries(windowsKitPathExec);
     log.debug(`Getting binary paths from default WindowsKit path.`, binaries);

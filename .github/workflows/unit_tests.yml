@@ -37,5 +37,7 @@ jobs:
       - name: Comment PR with coverage
         uses: romeovs/lcov-reporter-action@v0.3.1
         with:
+          title: Unit Tests Coverage Report
           lcov-file: coverage/lcov.info
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          delete-old-comments: true

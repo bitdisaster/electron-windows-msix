@@ -181,7 +181,7 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars?
  */
 function generatePassword() {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  const symbols = '!@#$%^&*()-_=+[]{}<>?,.';
+  const symbols = '!@#%^&*()-_=+[]{}<>?,.';
   const fullCharset = charset + symbols;
   const length = 16;
   let password = '';

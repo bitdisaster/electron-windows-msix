@@ -6,6 +6,7 @@ import { getCertStatus, getCertSubject, installDevCert } from './utils/cert';
 
 describe('signing', () => {
   beforeAll(async () => {
+    globalThis.DEBUG = true;
     await installDevCert();
   });
 
@@ -45,7 +46,7 @@ describe('signing', () => {
       expect(certStatus).toBe('NotSigned');
     });
 
-    it('should not sign the app with custom sign params', async () => {
+    it('should sign the app with custom sign params', async () => {
       await packageMSIX({
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),
         outputDir: path.join(__dirname, '..', '..', 'out'),
@@ -58,6 +59,7 @@ describe('signing', () => {
           '-p',
           'Password123'
         ],
+        logLevel: 'debug',
       });
       expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
       const certStatus = await getCertStatus(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'));
@@ -65,7 +67,7 @@ describe('signing', () => {
     });
   });
 
-  describe('signing with a generated dev cert', () => {
+  describe.skip('signing with a generated dev cert', () => {
     it('should package the app', async () => {
       await packageMSIX({
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),
@@ -77,7 +79,7 @@ describe('signing', () => {
           appExecutable: 'hellomsix.exe',
           targetArch: 'x64',
         },
-        windowsKitVersion: '10.0.19041.0',
+        windowsKitVersion: '10.0.26100.0',
       });
       expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
     });

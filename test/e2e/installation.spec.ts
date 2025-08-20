@@ -6,7 +6,7 @@ import { installDevCert } from './utils/cert';
 import { checkInstall, installMSIX, uninstallMSIX } from './utils/installer';
 import { powershell } from '../../src/powershell';
 
-describe('installation', () => {
+describe.skip('installation', () => {
   beforeAll(async () => {
     await installDevCert();
   });

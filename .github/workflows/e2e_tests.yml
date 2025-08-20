@@ -35,7 +35,7 @@ jobs:
           path: coverage
 
       - name: Comment PR with coverage
-        uses: romeovs/lcov-reporter-action@v0.3.1
+        uses: romeovs/lcov-reporter-action@2a28ec3e25fb7eae9cb537e9141603486f810d1a
         with:
           title: E2E Tests Coverage Report
           lcov-file: coverage/lcov.info

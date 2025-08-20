@@ -9,7 +9,7 @@ describe('package', () => {
     await installDevCert();
   });
 
-  describe.only('packaging', () => {
+  describe('packaging', () => {
     it('should package the app with an existing app manifest', async () => {
       await packageMSIX({
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),

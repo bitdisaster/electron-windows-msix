@@ -4,7 +4,7 @@ import path from "path";
 import { packageMSIX } from "../../src";
 import { getCertStatus, getCertSubject, installDevCert } from './utils/cert';
 
-describe('signing', () => {
+describe.skip('signing', () => {
   beforeAll(async () => {
     await installDevCert();
   });

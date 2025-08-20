@@ -24,7 +24,7 @@ describe('signing', () => {
 
     it('should sign the msix', async () => {
       const certStatus = await getCertStatus(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'));
-      expect(certStatus).not.toBe('NotSigned')
+      expect(certStatus).toBe('Valid')
     });
 
     it('should the cert should have the correct subject', async () => {

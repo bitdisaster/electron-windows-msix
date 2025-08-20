@@ -15,7 +15,7 @@ if (-not $trustedStore) {
       exit
     }
     # Install the public cert to LocalMachine\TrustedPeople (for MSIX trust)
-    Import-Certificate -FilePath $cerPath -CertStoreLocation "cert:\LocalMachine\TrustedPeople" | Out-Null
+    Import-Certificate -FilePath $certPath -CertStoreLocation "cert:\LocalMachine\TrustedPeople" | Out-Null
     Write-Host "  🏛️ Installed to: cert:\LocalMachine\TrustedPeople"
 } else {
     Write-Host "  ✅ Certificate already trusted in: cert:\LocalMachine\TrustedPeople"

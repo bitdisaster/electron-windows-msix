@@ -6,7 +6,6 @@ import { getCertStatus, getCertSubject, installDevCert } from './utils/cert';
 
 describe('signing', () => {
   beforeAll(async () => {
-    globalThis.DEBUG = true;
     await installDevCert();
   });
 
@@ -59,7 +58,6 @@ describe('signing', () => {
           '-p',
           'Password123'
         ],
-        logLevel: 'debug',
       });
       expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
       const certStatus = await getCertStatus(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'));

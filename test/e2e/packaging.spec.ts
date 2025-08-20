@@ -6,7 +6,6 @@ import { getCertStatus, installDevCert } from './utils/cert';
 
 describe('packaging', () => {
   beforeAll(async () => {
-    //globalThis.DEBUG = true;
     await installDevCert();
   });
 
@@ -73,8 +72,6 @@ describe('packaging', () => {
       windowsKitVersion: '10.0.26100.0',
     });
     expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
-    const certStatus = await getCertStatus(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'));
-    expect(certStatus).not.toBe('NotSigned');
   });
 
   it('should package the app without creating a pri', async () => {
@@ -182,7 +179,6 @@ describe('packaging', () => {
         targetArch: 'x64',
         packageMinOSVersion: '10.0.26100.0',
       },
-      logLevel: 'debug',
     });
     expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
   });

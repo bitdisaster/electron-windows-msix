@@ -9,12 +9,12 @@ export const installDevCert = async () => {
 }
 
 export const getCertSubject = async (pathToFile: string) => {
-  const subject = await powershell(`(Get-AuthenticodeSignature -FilePath ${pathToFile}).SignerCertificate.Subject`);
+  const subject = await powershell(`(Get-AuthenticodeSignature -FilePath "${pathToFile}").SignerCertificate.Subject`);
   return subject.replace(/^\s+|\s+$/g, '');
 }
 
 export const getCertStatus = async (pathToFile: string) => {
-  const status = await powershell(`(Get-AuthenticodeSignature -FilePath ${pathToFile}).Status`);
+  const status = await powershell(`(Get-AuthenticodeSignature -FilePath "${pathToFile}").Status`);
   return status.replace(/^\s+|\s+$/g, '');
 }
 

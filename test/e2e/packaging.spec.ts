@@ -251,7 +251,7 @@ describe('packaging', () => {
     }
   });
 
-  it('should throw errors with invalid data', async () => {
+  it('should throw errors with invalid manifest variables (minOSVersion > maxOSVersionTested)', async () => {
     try {
       await packageMSIX({
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),
@@ -262,7 +262,7 @@ describe('packaging', () => {
           packageVersion: '1.42.0.0',
           appExecutable: 'hellomsix.exe',
           targetArch: 'x64',
-          packageMinOSVersion: '10.0.19041.0',
+          packageMinOSVersion: '10.0.26100.0',
           packageMaxOSVersionTested: '10.0.14000.0',
         },
       });

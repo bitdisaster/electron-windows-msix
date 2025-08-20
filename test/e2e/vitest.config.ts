@@ -10,7 +10,8 @@ export default defineConfig({
     ],
     coverage: {
       provider: 'istanbul',
-      reporter: ['text'],
+      reporter: ['text', 'lcov'], // text for console, lcov for tooling
+      reportsDirectory: './coverage',
       include: [
         'src/**',
       ],

@@ -7,7 +7,7 @@ on:
     branches: [master, main]
 
 jobs:
-  e2e-tests:
+  e2e:
     runs-on: windows-2025
     permissions:
       contents: read
@@ -26,4 +26,16 @@ jobs:
         run: yarn install
 
       - name: Run tests with coverage
-        run: yarn test:e2e
+        run: yarn test:e2e:coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
+
+      - name: Comment PR with coverage
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          lcov-file: coverage/lcov.info
+          github-token: ${{ secrets.GITHUB_TOKEN }}

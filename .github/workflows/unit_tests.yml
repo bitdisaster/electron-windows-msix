@@ -7,7 +7,7 @@ on:
     branches: [master, main]
 
 jobs:
-  unit-tests:
+  unit:
     runs-on: windows-latest
     permissions:
       contents: read

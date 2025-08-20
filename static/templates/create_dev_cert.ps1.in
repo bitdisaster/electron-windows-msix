@@ -1,3 +1,4 @@
+Import-Module Microsoft.PowerShell.Security -Verbose
 
 # Customize these values
 $subjectName = 'CN={{SubjectName}}'

@@ -1,5 +1,3 @@
-Import-Module Microsoft.PowerShell.Security -Verbose
-
 # Customize these values
 $subjectName = 'CN={{SubjectName}}'
 $friendlyName = 'ELECTRON WINDOWS MSIX Dev Cert ($subjectName)'
@@ -13,8 +11,6 @@ $hasPassword = $pfxPasswordPlain -ne ""
 if ($hasPassword) {
   $pfxPassword = ConvertTo-SecureString -String $pfxPasswordPlain -Force -AsPlainText
 }
-
-
 
 # Look for existing cert with matching subject and friendly name
 $existingCert = Get-ChildItem -Path "cert:\CurrentUser\My" |

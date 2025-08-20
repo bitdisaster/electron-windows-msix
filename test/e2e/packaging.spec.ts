@@ -6,6 +6,7 @@ import { getCertStatus, installDevCert } from './utils/cert';
 
 describe('packaging', () => {
   beforeAll(async () => {
+    //globalThis.DEBUG = true;
     await installDevCert();
   });
 
@@ -15,33 +16,32 @@ describe('packaging', () => {
       outputDir: path.join(__dirname, '..', '..', 'out'),
       appManifest: path.join(__dirname, 'fixtures', 'AppxManifest_x64.xml'),
       windowsKitVersion: '10.0.26100.0',
-      logLevel: 'debug',
     });
     expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
   });
 
-  // it('should package the app with manifest variables', async () => {
-  //   await packageMSIX({
-  //     appDir: path.join(__dirname, 'fixtures', 'app-x64'),
-  //     outputDir: path.join(__dirname, '..', '..', 'out'),
-  //     manifestVariables: {
-  //       appDisplayName: 'Hello MSIX',
-  //       publisher: 'CN=Dev Publisher',
-  //       publisherDisplayName: 'Dev Publisher',
-  //       packageDisplayName: 'Hello MSIX',
-  //       packageDescription: 'Just a test app',
-  //       packageBackgroundColor: '#000000',
-  //       packageIdentity: 'com.example.app',
-  //       packageVersion: '1.42.0.0',
-  //       appExecutable: 'hellomsix.exe',
-  //       targetArch: 'x64',
-  //       packageMinOSVersion: '10.0.19041.0',
-  //       packageMaxOSVersionTested: '10.0.19041.0',
-  //     },
-  //     windowsKitVersion: '10.0.26100.0',
-  //   });
-  //   expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
-  // });
+  it('should package the app with manifest variables', async () => {
+    await packageMSIX({
+      appDir: path.join(__dirname, 'fixtures', 'app-x64'),
+      outputDir: path.join(__dirname, '..', '..', 'out'),
+      manifestVariables: {
+        appDisplayName: 'Hello MSIX',
+        publisher: 'CN=Dev Publisher',
+        publisherDisplayName: 'Dev Publisher',
+        packageDisplayName: 'Hello MSIX',
+        packageDescription: 'Just a test app',
+        packageBackgroundColor: '#000000',
+        packageIdentity: 'com.example.app',
+        packageVersion: '1.42.0.0',
+        appExecutable: 'hellomsix.exe',
+        targetArch: 'x64',
+        packageMinOSVersion: '10.0.19041.0',
+        packageMaxOSVersionTested: '10.0.19041.0',
+      },
+      windowsKitVersion: '10.0.26100.0',
+    });
+    expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
+  });
 
   // it('should package the app with prerelease version manifest variables', async () => {
   //   await packageMSIX({

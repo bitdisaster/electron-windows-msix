@@ -181,7 +181,7 @@ export const locateMSIXTooling = async (options: PackagingOptions, manifestVars?
  */
 function generatePassword() {
   const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  const symbols = '!@#$%^&*()-_=+[]{}<>?,.';
+  const symbols = '!@#%^&*()-_=+[]{}<>?,.';
   const fullCharset = charset + symbols;
   const length = 16;
   let password = '';
@@ -283,22 +283,3 @@ export const createLayout = async (program: ProgramOptions) => {
     await fs.copy(program.appDir, program.appLayout);
   }
 }
-
-// export async function createDevCertificate(
-//   publisher: string,
-//   { certFilePath, certFileName, install, program }: CreateDefaultCertOpts
-// ): Promise<string> {
-//   const makeCertOptions = {
-//     publisher,
-//     certFilePath: certFilePath || process.cwd(),
-//     certFileName: certFileName || 'default',
-//     install: typeof install === 'boolean' ? install : false,
-//     program: program || { windowsKit: path.dirname(await findSdkTool('makecert.exe')) },
-//   };
-
-//   if (!isValidPublisherName(publisherName)) {
-//     throw new Error(`Received invalid publisher name: '${publisherName}' did not conform to X.500 distinguished name syntax for MakeCert.`);
-//   }
-
-//   return makeCert(makeCertOptions);
-// }

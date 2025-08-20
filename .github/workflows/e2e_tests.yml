@@ -7,8 +7,8 @@ on:
     branches: [master, main]
 
 jobs:
-  unit:
-    runs-on: windows-latest
+  e2e:
+    runs-on: windows-2025
     permissions:
       contents: read
       pull-requests: write
@@ -26,7 +26,7 @@ jobs:
         run: yarn install
 
       - name: Run tests with coverage
-        run: yarn test:unit:coverage
+        run: yarn test:e2e:coverage
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -37,7 +37,7 @@ jobs:
       - name: Comment PR with coverage
         uses: romeovs/lcov-reporter-action@2a28ec3e25fb7eae9cb537e9141603486f810d1a
         with:
-          title: Unit Tests Coverage Report
+          title: E2E Tests Coverage Report
           lcov-file: coverage/lcov.info
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true

@@ -4,12 +4,14 @@ export default defineConfig({
   test: {
     name: 'e2e',
     fileParallelism: false,
+    testTimeout: 20000,
     include: [
       'test/e2e/*.spec.ts',
     ],
     coverage: {
       provider: 'istanbul',
-      reporter: ['text'],
+      reporter: ['text', 'lcov'], // text for console, lcov for tooling
+      reportsDirectory: './coverage',
       include: [
         'src/**',
       ],

@@ -9,6 +9,11 @@ vi.mock('spawn-rx', () => ({
 describe('powershell', () => {
   it('should call powershell', async () => {
     await powershell('C:\\out\\create_dev_cert.ps1');
-    expect(spawnPromise).toHaveBeenCalledWith('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', 'C:\\out\\create_dev_cert.ps1'], undefined);
+    expect(spawnPromise).toHaveBeenCalledWith('pwsh.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', 'C:\\out\\create_dev_cert.ps1'], undefined);
+  });
+
+  it('should call powershell', async () => {
+    await powershell('Get-Process');
+    expect(spawnPromise).toHaveBeenCalledWith('pwsh.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', 'Get-Process'], undefined);
   });
 });

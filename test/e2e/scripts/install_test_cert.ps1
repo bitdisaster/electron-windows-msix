@@ -1,11 +1,11 @@
+Add-Type -AssemblyName System.Security.Cryptography.X509Certificates
 
 # Path to cert file one folder up relative to script location
 $scriptDir = Split-Path -Parent $PSCommandPath
-$cerPath = Join-Path $scriptDir "..\fixtures\MSIXDevCert.cer" | Resolve-Path
+$certPath = Join-Path $scriptDir "..\fixtures\MSIXDevCert.cer" | Resolve-Path
 
 # Load the certificate from file
-$cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-$cert.Import($cerPath)
+$cert = [System.Security.Cryptography.X509Certificates.X509CertificateLoader]::LoadCertificateFromFile($certPath)
 
 $trustedStore = Get-ChildItem -Path "cert:\LocalMachine\TrustedPeople" | Where-Object { $_.Thumbprint -eq $cert.Thumbprint }
 if (-not $trustedStore) {
@@ -15,7 +15,7 @@ if (-not $trustedStore) {
       exit
     }
     # Install the public cert to LocalMachine\TrustedPeople (for MSIX trust)
-    Import-Certificate -FilePath $cerPath -CertStoreLocation "cert:\LocalMachine\TrustedPeople" | Out-Null
+    Import-Certificate -FilePath $certPath -CertStoreLocation "cert:\LocalMachine\TrustedPeople" | Out-Null
     Write-Host "  🏛️ Installed to: cert:\LocalMachine\TrustedPeople"
 } else {
     Write-Host "  ✅ Certificate already trusted in: cert:\LocalMachine\TrustedPeople"

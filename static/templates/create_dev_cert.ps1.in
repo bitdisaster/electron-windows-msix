@@ -1,4 +1,3 @@
-
 # Customize these values
 $subjectName = 'CN={{SubjectName}}'
 $friendlyName = 'ELECTRON WINDOWS MSIX Dev Cert ($subjectName)'
@@ -12,8 +11,6 @@ $hasPassword = $pfxPasswordPlain -ne ""
 if ($hasPassword) {
   $pfxPassword = ConvertTo-SecureString -String $pfxPasswordPlain -Force -AsPlainText
 }
-
-
 
 # Look for existing cert with matching subject and friendly name
 $existingCert = Get-ChildItem -Path "cert:\CurrentUser\My" |
@@ -39,9 +36,9 @@ if ($existingCert) {
 }
 
 # Export public certificate (.cer)
-Export-Certificate -Cert $cert -FilePath $cerOutputPath | Out-Null
+Export-Certificate -Cert $cert -FilePath $cerOutputPath
 
 # Export private certificate with password (.pfx)
 if ($hasPassword) {
-  Export-PfxCertificate -Cert $cert -FilePath $pfxOutputPath -Password $pfxPassword | Out-Null
+  Export-PfxCertificate -Cert $cert -FilePath $pfxOutputPath -Password $pfxPassword
 }

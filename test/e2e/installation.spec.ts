@@ -22,6 +22,7 @@ describe.skip('installation', () => {
     });
     expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
   });
+
   it('should install the app', async () => {
     await installMSIX(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'));
     const install = await checkInstall('Electron.MySuite.HelloMSIX');
@@ -29,6 +30,7 @@ describe.skip('installation', () => {
     expect(install.name).toBe('Electron.MySuite.HelloMSIX');
     expect(install.version).toBe('1.2.3.4');
   });
+
   it('should run the app', async () => {
     const command = `explorer.exe shell:appsFolder\\Electron.MySuite.HelloMSIX_98sq593n0v5ec!HelloMSIX`;
     await powershell(command);
@@ -37,6 +39,7 @@ describe.skip('installation', () => {
     expect(numberOfProcesses).toBeGreaterThan(0);
     await powershell(`ps "hellomsix" | kill`);
   });
+
   it('should uninstall the app', async () => {
     await uninstallMSIX('Electron.MySuite.HelloMSIX');
     const install = await checkInstall('Electron.MySuite.HelloMSIX');

@@ -7,7 +7,7 @@ on:
     branches: [master, main]
 
 jobs:
-  unit-tests:
+  e2e-tests:
     runs-on: windows-2025
     permissions:
       contents: read

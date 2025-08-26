@@ -37,8 +37,8 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@malept/cross-spawn-promise": "^2.0.0",
     "chalk": "^3.0.0",
-    "cross-spawn-promise": "^0.10.2",
     "fs-extra": "^11.2.0",
     "xml-escape": "^1.1.0"
   }

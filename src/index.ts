@@ -23,6 +23,7 @@ export const packageMSIX = async (options: PackagingOptions) => {
 
   return {
     msixPackage: program.msix,
-    certificate: program.cert_pfx,
+    dev_cert: program.createDevCert ? program.cert_pfx : undefined,
+    dev_cert_pass: program.createDevCert && !options.cert_pass ?  program.cert_pass : undefined,
   };
 }

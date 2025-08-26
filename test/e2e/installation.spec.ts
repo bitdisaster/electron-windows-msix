@@ -32,7 +32,7 @@ describe('installation', () => {
   });
 
   it('should run the app', async () => {
-    const command = `explorer.exe shell:appsFolder\\Electron.MySuite.HelloMSIX_98sq593n0v5ec!HelloMSIX`;
+    const command = `explorer.exe shell:appsFolder\\Electron.MySuite.HelloMSIX_98sq593n0v5ec!HelloMSIX; Start-Sleep -Seconds 1`;
     await powershell(command);
     const result = await powershell(`(ps "hellomsix").length`);
     const numberOfProcesses = parseInt(result);

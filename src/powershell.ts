@@ -1,7 +1,7 @@
-import { spawnPromise } from 'spawn-rx';
 import { log } from './logger';
+import spawn from 'cross-spawn-promise';
 
-export async function powershell(scriptOrCommand: string, options?: any) {
+export async function powershell(scriptOrCommand: string) {
   log.debug('Running powershell command', { commandAndArgs: scriptOrCommand });
   const isScript = scriptOrCommand.endsWith('.ps1');
   const args = ['-NoProfile', '-ExecutionPolicy', 'Bypass'];
@@ -10,7 +10,7 @@ export async function powershell(scriptOrCommand: string, options?: any) {
   } else {
     args.push('-Command', scriptOrCommand);
   }
-  const result = await spawnPromise('pwsh.exe', args, options) as unknown as Promise<string>;
+  const result = await spawn('pwsh.exe', args, { encoding: 'utf-8' });
   log.debug('Powershell command result', { result });
-  return result;
+  return result ? result.toString() : '';
 }

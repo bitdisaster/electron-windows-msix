@@ -65,7 +65,7 @@ describe('signing', () => {
     });
   });
 
-  describe.skip('signing with a generated dev cert', () => {
+  describe('signing with a generated dev cert', () => {
     it('should package the app', async () => {
       await packageMSIX({
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),
@@ -87,7 +87,7 @@ describe('signing', () => {
       expect(certStatus).not.toBe('NotSigned')
     });
 
-    it('should the cert should have the correct subject', async () => {
+    it('should have the correct subject', async () => {
       const certSubject = await getCertSubject(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'));
       expect(certSubject).toBe('CN=Dev Publisher')
     });

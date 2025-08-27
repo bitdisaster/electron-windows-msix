@@ -1,6 +1,6 @@
 {
   "name": "electron-windows-msix",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "MSIX packager for Electron Apps",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -39,6 +39,7 @@
   "dependencies": {
     "@malept/cross-spawn-promise": "^2.0.0",
     "chalk": "^3.0.0",
+    "debug": "^4.4.1",
     "fs-extra": "^11.2.0",
     "xml-escape": "^1.1.0"
   }

@@ -1,11 +1,18 @@
 import chalk from 'chalk';
+import createDebug from 'debug';
 
+const debug = createDebug('electron-windows-msix');
 export class log {
   private static log(level: 'info' | 'warn' | 'error' | 'debug', message: string, object?: any) {
     const logMessage = `${level}: ${message}`;
     let logObject = '';
     if(object)
       logObject = JSON.stringify(object, null, 2 ).replace(/\\r\\n/g, '\n').replace(/\\\\/g, '\\').replace(/\\\"/g, '"');
+
+    if(debug.enabled) {
+      debug('%s %s', logMessage, logObject);
+      return
+    }
 
     if(level === 'debug' && !!globalThis.DEBUG) {
       console.log(chalk.grey(logMessage));

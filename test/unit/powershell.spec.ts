@@ -18,4 +18,11 @@ describe('powershell', () => {
     await powershell('Get-Process');
     expect(spawn).toHaveBeenCalledWith('pwsh.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', 'Get-Process']);
   });
+
+  it('should call powershell', async () => {
+    vi.mocked(spawn).mockResolvedValue({toString: () => 'Hello'} as any);
+    const result = await powershell('Get-Process');
+    expect(result).toBe('Hello');
+    expect(spawn).toHaveBeenCalledWith('pwsh.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', 'Get-Process']);
+  });
 });

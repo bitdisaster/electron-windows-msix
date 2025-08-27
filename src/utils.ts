@@ -41,6 +41,10 @@ export const removePublisherPrefix = (publisher: string) => {
   return publisher.replace(/^CN=/, "");
 }
 
+export const ensurePublisherPrefix = (publisher: string) => {
+  return !publisher || publisher.startsWith('CN=') ? publisher : `CN=${publisher}`;
+}
+
 export const ensureFolders = async (options: PackagingOptions) => {
   const outputDir = options.outputDir;
   const layoutDir = path.join(options.outputDir, 'msix_layout');
@@ -61,7 +65,7 @@ export const ensureFolders = async (options: PackagingOptions) => {
 
 export const verifyOptions = async (options: PackagingOptions, manifestVars?: ManifestVariables) => {
   const { manifestIsSparsePackage, manifestPublisher } = manifestVars || {};
-  const publisher = manifestPublisher || options.manifestVariables?.publisher;
+  const publisher = manifestPublisher || ensurePublisherPrefix(options.manifestVariables?.publisher);
   let hasManifestParams = false;
   log.debug('You are calling with following packaging options', options)
   if(!options.appManifest && options.manifestVariables) {

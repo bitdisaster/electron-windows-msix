@@ -405,7 +405,7 @@ describe('utils', () => {
       }
 
       vi.mocked(fs.exists).mockResolvedValue(true as any);
-      vi.mocked(getCertPublisher).mockResolvedValue('Electron');
+      vi.mocked(getCertPublisher).mockResolvedValue('CN=Electron');
       await verifyOptions(packagingOptions);
       expect(log.error).not.toHaveBeenCalled();
       expect(log.warn).not.toHaveBeenCalled();
@@ -571,6 +571,38 @@ describe('utils', () => {
       expect(log.warn).toHaveBeenCalledWith('Cert cert password <cert_pass> not provided.');
     });
 
+    it('should not throw an error if the publisher prefix is missing in the manifest variables but matches the publisher of the cert', async () => {
+      const packagingOptions: PackagingOptions = {
+        ...incompletePackagingOptions,
+        manifestVariables: {
+          publisher: 'Electron',
+          packageIdentity: 'Electron.App',
+          packageVersion: '1.0.0',
+          appExecutable: 'C:\\app\\app.exe',
+          targetArch: 'x64',
+        },
+        cert: 'C:\\cert.pfx',
+        cert_pass: '123456',
+      } as any
+      vi.mocked(fs.exists).mockResolvedValue(true as any);
+      vi.mocked(getCertPublisher).mockResolvedValue('CN=Electron');
+      await verifyOptions(packagingOptions);
+      expect(log.error).not.toHaveBeenCalled();
+    });
+
+    it('should throw an error if the publisher prefix is missing in the manifest and does not match the publisher of the cert', async () => {
+      const packagingOptions: PackagingOptions = {
+        ...incompletePackagingOptions,
+        appManifest: 'C:\\app\\app.manifest',
+        cert: 'C:\\cert.pfx',
+        cert_pass: '123456',
+      } as any
+      vi.mocked(getCertPublisher).mockResolvedValue('CN=Electron');
+      await verifyOptions(packagingOptions, { manifestPublisher: 'Electron' } as any);
+      expect(log.error).toHaveBeenCalledWith('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: 'Electron', cert_publisher: 'CN=Electron'});
+    });
+
+
     it('should throw an error if the publisher in the manifest does not match the publisher of the cert', async () => {
       const packagingOptions: PackagingOptions = {
         ...incompletePackagingOptions,
@@ -579,7 +611,7 @@ describe('utils', () => {
         cert_pass: '123456',
       } as any
       vi.mocked(getCertPublisher).mockResolvedValue('Electron');
-      await verifyOptions(packagingOptions, { manifestIsSparsePackage: false, manifestPublisher: 'NotElectron' } as any);
+      await verifyOptions(packagingOptions, { manifestPublisher: 'NotElectron' } as any);
       expect(log.error).toHaveBeenCalledWith('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: 'NotElectron', cert_publisher: 'Electron'});
     });
 
@@ -597,7 +629,7 @@ describe('utils', () => {
         } as any
       } as any
       vi.mocked(getCertPublisher).mockResolvedValue('Electron');
-      await verifyOptions(packagingOptions, { manifestIsSparsePackage: false, manifestPublisher: 'NotElectron' } as any);
+      await verifyOptions(packagingOptions, { manifestPublisher: 'NotElectron' } as any);
       expect(log.error).toHaveBeenCalledWith('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: 'NotElectron', cert_publisher: 'Electron'});
     });
   });

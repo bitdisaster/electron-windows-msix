@@ -1,6 +1,8 @@
-import { log } from "./logger"
-import { ProgramOptions } from "./types";
-import * as childProcess from 'child_process';
+import { sign as windowsSign, type SignOptions } from "@electron/windows-sign";
+import childProcess from 'child_process';
+
+import { log } from "./logger.mjs"
+import { type ProgramOptions } from "./types.mjs";
 
 const  run = async (executable: string, args: Array<string>)  => {
   return new Promise<string>((resolve, reject) => {
@@ -92,11 +94,6 @@ export const make = async (program: ProgramOptions) => {
 }
 
 export const sign = async (program: ProgramOptions) => {
-  const {signTool, signParams, msix } = program;
-  const args = [
-    'sign',
-    ...signParams,
-    msix
-  ]
-  await run(signTool, args);
+  const signOptions = program.windowsSignOptions;
+  await windowsSign(signOptions as SignOptions);
 }

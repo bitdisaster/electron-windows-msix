@@ -1,12 +1,16 @@
 import * as path from "path";
-import * as fs from "fs-extra";
+import fs from "fs-extra";
 import {
-  ManifestVariables,
-  PackagingOptions
-} from "./types";
-import { removeFileExtension, removePublisherPrefix } from "./utils";
-import { ensureWindowsVersion } from "./win-version";
+  type ManifestVariables,
+  type PackagingOptions
+} from "./types.mjs";
+import { removeFileExtension, removePublisherPrefix } from "./utils.mjs";
+import { ensureWindowsVersion } from "./win-version.mjs";
+import { fileURLToPath } from 'url';
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const DEFAULT_OS_VERSION = '10.0.14393.0';
 const DEFAULT_BACKGROUND_COLOR = 'transparent';
 

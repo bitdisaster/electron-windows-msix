@@ -1,8 +1,13 @@
-import { ProgramOptions } from './types';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { powershell } from './powershell';
-import { removePublisherPrefix } from './utils';
+import fs from 'fs-extra';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import { powershell } from './powershell.mjs';
+import { type ProgramOptions } from './types.mjs';
+import { removePublisherPrefix } from './utils.mjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const ensureDevCert = async (programOptions: ProgramOptions) => {
   if(programOptions.createDevCert) {

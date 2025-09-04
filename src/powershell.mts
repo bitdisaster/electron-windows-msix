@@ -1,5 +1,6 @@
-import { log } from './logger';
 import { spawn } from '@malept/cross-spawn-promise';
+
+import { log } from './logger.mjs';
 
 export async function powershell(scriptOrCommand: string) {
   log.debug('Running powershell command', { commandAndArgs: scriptOrCommand });

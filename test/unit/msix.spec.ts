@@ -1,8 +1,9 @@
 import { spawn } from 'child_process';
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getCertPublisher, make, pri, priConfig, sign } from "../../src/msix";
+import { getCertPublisher, make, pri, priConfig, sign } from "../../src/msix.mts";
+import { sign as windowsSign } from '@electron/windows-sign';
 import EventEmitter from 'events';
-import { log } from '../../src/logger';
+import { log } from '../../src/logger.mts';
 
 vi.mock('child_process', () => ({
   spawn: vi.fn(() => {
@@ -23,6 +24,10 @@ vi.mock('child_process', () => ({
     }
     return emitter;
   }),
+}));
+
+vi.mock('@electron/windows-sign', () => ({
+    sign: vi.fn(),
 }));
 
 vi.mock('../../src/logger');
@@ -146,11 +151,23 @@ describe('msix', () => {
   });
 
   it('should call sign with the correct arguments', async () => {
-    await sign({
+    const result = sign({
       signTool: 'C:\\SignTool.exe',
       signParams: ['-fd', 'sha256', '-f', 'C:\\cert.pfx'],
       msix: 'C:\\myapp.msix',
+      windowsSignOptions: {
+        certificateFile: 'C:\\cert.pfx',
+        certificatePassword: 'password',
+        hashes: ['sha256'],
+        files: ['C:\\myapp.msix'],
+      },
     } as any);
-    expect(spawn).toHaveBeenCalledWith('C:\\SignTool.exe', ['sign', '-fd', 'sha256', '-f', 'C:\\cert.pfx', 'C:\\myapp.msix'], {});
+
+    expect(windowsSign).toHaveBeenCalledWith({
+      certificateFile: 'C:\\cert.pfx',
+      certificatePassword: 'password',
+      hashes: ['sha256'],
+      files: ['C:\\myapp.msix'],
+    });
   });
 });

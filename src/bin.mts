@@ -96,6 +96,9 @@ export const make = async (program: ProgramOptions) => {
 export const sign = async (program: ProgramOptions) => {
   if(program.sign) {
     const signOptions = program.windowsSignOptions;
+    log.debug('Signing with options', signOptions);
     await windowsSign(signOptions as SignOptions);
+  } else {
+    log.debug('Skipping signing.');
   }
 }

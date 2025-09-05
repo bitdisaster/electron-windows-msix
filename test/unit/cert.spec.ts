@@ -16,7 +16,7 @@ vi.mock('fs-extra', async (importOriginal) => {
   };
 });
 
-vi.mock('../../src/powershell', () => ({
+vi.mock('../../src/powershell.mts', () => ({
   powershell: vi.fn(),
 }));
 

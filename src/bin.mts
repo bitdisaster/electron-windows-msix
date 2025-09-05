@@ -94,6 +94,8 @@ export const make = async (program: ProgramOptions) => {
 }
 
 export const sign = async (program: ProgramOptions) => {
-  const signOptions = program.windowsSignOptions;
-  await windowsSign(signOptions as SignOptions);
+  if(program.sign) {
+    const signOptions = program.windowsSignOptions;
+    await windowsSign(signOptions as SignOptions);
+  }
 }

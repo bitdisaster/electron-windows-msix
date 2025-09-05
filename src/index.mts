@@ -1,6 +1,6 @@
+import { make, pri, priConfig, sign } from './bin.mjs';
 import { ensureDevCert } from './cert.mjs';
 import { getManifestVariables } from './manifestation.mjs';
-import { make, pri, priConfig, sign } from './msix.mjs';
 import { type Artifacts, type ManifestGenerationVariables, type PackagingOptions, type WindowsSignOptions } from './types.mjs';
 import { createLayout, ensureFolders, makeProgramOptions, setLogLevel, verifyOptions } from './utils.mjs';
 
@@ -17,9 +17,7 @@ export const packageMSIX = async (options: PackagingOptions) => {
   await priConfig(program);
   await pri(program);
   await make(program);
-  if(program.sign) {
-    await sign(program);
-  }
+  await sign(program);
 
   return {
     msixPackage: program.msix,

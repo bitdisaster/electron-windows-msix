@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "lib": ["ES2022"]
   },
-  "include": ["src/**/*.ts", "src/msix.mts", "src/index.mts", "src/powershell.mts", "src/types.mts", "src/utils.mts", "src/win-version.mts", "src/manifestation.mts", "src/logger.mts", "src/cert.mts"]
+  "include": ["src/**/*.mts"]
 }

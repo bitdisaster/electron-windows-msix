@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 
 import { log } from "./logger.mjs";
 import { manifest } from './manifestation.mjs';
-import { getCertPublisher } from './msix.mjs';
+import { getCertPublisher } from './bin.mjs';
 import { type ManifestVariables, type PackagingOptions, type ProgramOptions, type WindowsSignOptions } from "./types.mjs";
 import { isValidVersion, WindowsOSVersion } from './win-version.mjs';
 

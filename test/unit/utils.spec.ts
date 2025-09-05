@@ -12,7 +12,7 @@ import {
 } from 'vitest'
 
 import { log } from '../../src/logger.mts';
-import { getCertPublisher } from '../../src/msix.mts';
+import { getCertPublisher } from '../../src/bin.mts';
 import {
   ManifestVariables,
   PackagingOptions,
@@ -42,6 +42,7 @@ const restoreProcessorArchitecture = () => {
 const incompletePackagingOptions: PackagingOptions = {
   appDir: 'C:\\app',
   outputDir: 'C:\\out',
+  sign: true,
 }
 
 const minimalPackagingOptions: PackagingOptions = {
@@ -53,11 +54,11 @@ const minimalPackagingOptions: PackagingOptions = {
     packageVersion: '1.0.0.0',
     appExecutable: 'app.exe',
     targetArch: 'x64',
-  }
+  },
 }
 
-vi.mock('../../src/logger');
-vi.mock('../../src/msix');
+vi.mock('../../src/logger.mts');
+vi.mock('../../src/bin.mts');
 vi.mock('fs-extra', async (importOriginal) => {
   const actual = await importOriginal() as Record < string,
     any > ;

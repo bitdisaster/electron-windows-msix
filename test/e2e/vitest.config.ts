@@ -16,9 +16,9 @@ export default defineConfig({
         'src/**',
       ],
       exclude: [
-        'src/win-version.mts',
-        'src/powershell.mts',
-        'src/logger.mts',
+        'src/win-version.ts',
+        'src/powershell.ts',
+        'src/logger.ts',
       ],
     }
   },

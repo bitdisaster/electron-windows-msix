@@ -1,15 +1,14 @@
 {
-  "compilerOptions" : {
-    "module": "NodeNext",
+  "compilerOptions": {
+    "module": "CommonJS",
     "esModuleInterop": true,
     "target": "ES2022",
-    "moduleResolution": "NodeNext",
-    "verbatimModuleSyntax": true,
+    "moduleResolution": "Node",
     "sourceMap": true,
     "declaration": true,
     "outDir": "lib",
     "skipLibCheck": true,
     "lib": ["ES2022"]
   },
-  "include": ["src/**/*.mts"]
+  "include": ["src/**/*.ts"]
 }

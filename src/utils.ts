@@ -1,16 +1,14 @@
 import crypto from 'crypto';
 import fs from 'fs-extra';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-import { log } from "./logger.mjs";
-import { manifest } from './manifestation.mjs';
-import { getCertPublisher } from './bin.mjs';
-import { type ManifestVariables, type PackagingOptions, type ProgramOptions, type WindowsSignOptions } from "./types.mjs";
-import { isValidVersion, WindowsOSVersion } from './win-version.mjs';
+import { log } from "./logger";
+import { manifest } from './manifestation';
+import { getCertPublisher } from './bin';
+import { ManifestVariables, PackagingOptions, ProgramOptions, WindowsSignOptions } from "./types";
+import { isValidVersion, WindowsOSVersion } from './win-version';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
 const DEFAULT_WIN_KIT_VERSION = '10.0.26100.0';
 const MIN_ARM_WIN_KIT_VERSION = '10.0.22621.0';
 const WIN_KIT_BIN_PATH = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin';

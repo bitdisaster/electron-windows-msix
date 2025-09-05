@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import path from "path";
 import { describe, it, expect, beforeAll } from "vitest";
 
-import { packageMSIX } from "../../src/index.mjs";
+import { packageMSIX } from "../../src/index";
 import { getCertStatus, getCertSubject, installDevCert } from './utils/cert';
 
 describe('signing', () => {

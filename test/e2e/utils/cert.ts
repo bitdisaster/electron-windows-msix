@@ -1,7 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { powershell } from '../../../src/powershell.mjs';
+import { powershell } from '../../../src/powershell';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

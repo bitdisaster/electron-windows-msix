@@ -2,8 +2,8 @@
   "name": "electron-windows-msix",
   "version": "2.0.1",
   "description": "MSIX packager for Electron Apps",
-  "main": "lib/index.mjs",
-  "types": "lib/index.d.mts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "type": "module",
   "scripts": {
     "prepublish": "npm run build",
@@ -38,7 +38,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@electron/windows-sign": "^2.0.2",
+    "@electron/windows-sign": "^1.2.2",
     "@malept/cross-spawn-promise": "^2.0.0",
     "chalk": "^3.0.0",
     "debug": "^4.4.1",

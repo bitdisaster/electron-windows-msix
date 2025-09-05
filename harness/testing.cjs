@@ -60,6 +60,22 @@ const main = async () => {
   console.log(artifacts);
 }
 
+// {
+//   "manifestVariables": {
+//     "packageDescription": "My Electron application description",
+//     "appExecutable": "Test-App.exe",
+//     "packageVersion": "1.0.0-beta.1",
+//     "publisher": "Test Author",
+//     "packageIdentity": "Test-App",
+//     "targetArch": "x64"
+//   },
+//   "devCert": "C:\Users\RUNNER~1\AppData\Local\Temp\electron-forge-test-1757107451719\electron-forge-test\default.pfx",
+//   "makeVersionWinStoreCompatible": true,
+//   "appDir": "C:\Users\RUNNER~1\AppData\Local\Temp\electron-forge-test-1757107451719\electron-forge-test\out\Test-App-win32-x64",
+//   "outputDir": "C:\Users\RUNNER~1\AppData\Local\Temp\electron-forge-test-1757107451719\electron-forge-test\out\make",
+//   "logLevel": "debug"
+// }
+
 main();
 
 // packageMSIX({

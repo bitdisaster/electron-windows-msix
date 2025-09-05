@@ -11,13 +11,13 @@ import {
   afterAll
 } from 'vitest'
 
-import { log } from '../../src/logger.mts';
-import { getCertPublisher } from '../../src/bin.mts';
+import { log } from '../../src/logger';
+import { getCertPublisher } from '../../src/bin';
 import {
   ManifestVariables,
   PackagingOptions,
   ProgramOptions
-} from '../../src/types.mts';
+} from '../../src/types';
 import {
   removeFileExtension,
   removePublisherPrefix,
@@ -28,7 +28,7 @@ import {
   makeProgramOptions,
   createLayout,
   getBinaries
-} from '../../src/utils.mts';
+} from '../../src/utils';
 import { SignOptions } from '@electron/windows-sign';
 
 let originalProcessorArchitecture = process.env.PROCESSOR_ARCHITECTURE;
@@ -57,8 +57,8 @@ const minimalPackagingOptions: PackagingOptions = {
   },
 }
 
-vi.mock('../../src/logger.mts');
-vi.mock('../../src/bin.mts');
+vi.mock('../../src/logger');
+vi.mock('../../src/bin');
 vi.mock('fs-extra', async (importOriginal) => {
   const actual = await importOriginal() as Record < string,
     any > ;

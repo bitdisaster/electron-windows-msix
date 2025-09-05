@@ -3,8 +3,8 @@ import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getCertPublisher, make, pri, priConfig, sign } from "../../src/bin.mts";
-import { log } from '../../src/logger.mts';
+import { getCertPublisher, make, pri, priConfig, sign } from "../../src/bin";
+import { log } from '../../src/logger';
 
 vi.mock('child_process', () => ({
   spawn: vi.fn(() => {
@@ -31,7 +31,7 @@ vi.mock('@electron/windows-sign', () => ({
     sign: vi.fn(),
 }));
 
-vi.mock('../../src/logger.mts');
+vi.mock('../../src/logger');
 
 describe('bin', () => {
   beforeEach(() => {

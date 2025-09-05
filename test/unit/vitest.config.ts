@@ -14,8 +14,8 @@ export default defineConfig({
         'src/**',
       ],
       exclude: [
-        'src/logger.mts', // Not necessary to test
-        'src/index.mts', // Everything is covered by other tests
+        'src/logger.ts', // Not necessary to test
+        'src/index.ts', // Everything is covered by other tests
       ]
     },
   },

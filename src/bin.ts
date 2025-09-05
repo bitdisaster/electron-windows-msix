@@ -1,8 +1,8 @@
-import { sign as windowsSign, type SignOptions } from "@electron/windows-sign";
+import { sign as windowsSign, SignOptions } from "@electron/windows-sign";
 import { spawn } from 'child_process';
 
-import { log } from "./logger.mjs"
-import { type ProgramOptions } from "./types.mjs";
+import { log } from "./logger";
+import { ProgramOptions } from "./types";
 
 const  run = async (executable: string, args: Array<string>)  => {
   return new Promise<string>((resolve, reject) => {

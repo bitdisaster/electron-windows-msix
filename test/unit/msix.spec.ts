@@ -1,8 +1,9 @@
-import { spawn } from 'child_process';
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getCertPublisher, make, pri, priConfig, sign } from "../../src/msix.mts";
 import { sign as windowsSign } from '@electron/windows-sign';
-import EventEmitter from 'events';
+import { spawn } from 'child_process';
+import { EventEmitter } from 'events';
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { getCertPublisher, make, pri, priConfig, sign } from "../../src/msix.mts";
 import { log } from '../../src/logger.mts';
 
 vi.mock('child_process', () => ({
@@ -30,7 +31,7 @@ vi.mock('@electron/windows-sign', () => ({
     sign: vi.fn(),
 }));
 
-vi.mock('../../src/logger');
+vi.mock('../../src/logger.mts');
 
 describe('msix', () => {
   beforeEach(() => {

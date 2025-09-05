@@ -230,7 +230,7 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
   let cert_pfx = windowsSignOptions?.certificateFile || '';
   let cert_cer = '';
   let cert_pass = '';
-  const createDevCert = !options.windowsSignOptions?.certificateFile && sign && !options.windowsSignOptions;
+  const createDevCert = !options.windowsSignOptions?.certificateFile && sign;
   if(sign) {
     windowsSignOptions = options.windowsSignOptions || {files: [msix], certificateFile: '', certificatePassword: '', hashes: ["sha256"] as any };
     cert_pass = windowsSignOptions?.certificatePassword || generatePassword();

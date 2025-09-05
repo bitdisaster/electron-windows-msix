@@ -1,12 +1,12 @@
 import { sign as windowsSign, type SignOptions } from "@electron/windows-sign";
-import childProcess from 'child_process';
+import { spawn } from 'child_process';
 
 import { log } from "./logger.mjs"
 import { type ProgramOptions } from "./types.mjs";
 
 const  run = async (executable: string, args: Array<string>)  => {
   return new Promise<string>((resolve, reject) => {
-    const proc = childProcess.spawn(executable, args, {});
+    const proc = spawn(executable, args, {});
     log.debug(`Calling ${executable} with args`, args);
 
     const cleanOutData = (data: any) => {

@@ -1,20 +1,22 @@
-import * as fs from 'fs-extra';
+import fs from 'fs-extra';
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ensureDevCert } from "../../src/cert";
-import { powershell } from '../../src/powershell';
+import { ensureDevCert } from "../../src/cert.mts";
+import { powershell } from '../../src/powershell.mts';
 
 vi.mock('fs-extra', async (importOriginal) => {
   const actual = await importOriginal() as Record < string,
     any > ;
   return {
+    default: {
     readFileSync: actual.readFileSync,
-    writeFileSync: vi.fn(),
-    unlinkSync: vi.fn(),
+      writeFileSync: vi.fn(),
+      unlinkSync: vi.fn(),
+    }
   };
 });
 
-vi.mock('../../src/powershell', () => ({
+vi.mock('../../src/powershell.mts', () => ({
   powershell: vi.fn(),
 }));
 

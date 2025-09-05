@@ -1,8 +1,10 @@
+import { sign as windowsSign } from '@electron/windows-sign';
 import { spawn } from 'child_process';
+import { EventEmitter } from 'events';
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getCertPublisher, make, pri, priConfig, sign } from "../../src/msix";
-import EventEmitter from 'events';
-import { log } from '../../src/logger';
+
+import { getCertPublisher, make, pri, priConfig, sign } from "../../src/bin.mts";
+import { log } from '../../src/logger.mts';
 
 vi.mock('child_process', () => ({
   spawn: vi.fn(() => {
@@ -25,10 +27,15 @@ vi.mock('child_process', () => ({
   }),
 }));
 
-vi.mock('../../src/logger');
+vi.mock('@electron/windows-sign', () => ({
+    sign: vi.fn(),
+}));
 
-describe('msix', () => {
+vi.mock('../../src/logger.mts');
+
+describe('bin', () => {
   beforeEach(() => {
+    vi.mocked(windowsSign).mockClear();
     vi.mocked(spawn).mockClear();
   });
 
@@ -146,11 +153,41 @@ describe('msix', () => {
   });
 
   it('should call sign with the correct arguments', async () => {
-    await sign({
+    sign({
+      sign: true,
       signTool: 'C:\\SignTool.exe',
       signParams: ['-fd', 'sha256', '-f', 'C:\\cert.pfx'],
       msix: 'C:\\myapp.msix',
+      windowsSignOptions: {
+        certificateFile: 'C:\\cert.pfx',
+        certificatePassword: 'password',
+        hashes: ['sha256'],
+        files: ['C:\\myapp.msix'],
+      },
     } as any);
-    expect(spawn).toHaveBeenCalledWith('C:\\SignTool.exe', ['sign', '-fd', 'sha256', '-f', 'C:\\cert.pfx', 'C:\\myapp.msix'], {});
+
+    expect(windowsSign).toHaveBeenCalledWith({
+      certificateFile: 'C:\\cert.pfx',
+      certificatePassword: 'password',
+      hashes: ['sha256'],
+      files: ['C:\\myapp.msix'],
+    });
+  });
+
+  it('should not call sign if sign is false', async () => {
+    sign({
+      sign: false,
+      signTool: 'C:\\SignTool.exe',
+      signParams: ['-fd', 'sha256', '-f', 'C:\\cert.pfx'],
+      msix: 'C:\\myapp.msix',
+      windowsSignOptions: {
+        certificateFile: 'C:\\cert.pfx',
+        certificatePassword: 'password',
+        hashes: ['sha256'],
+        files: ['C:\\myapp.msix'],
+      },
+    } as any);
+
+    expect(windowsSign).not.toHaveBeenCalled();
   });
 });

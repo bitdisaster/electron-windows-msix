@@ -1,13 +1,16 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as crypto from 'crypto';
+import crypto from 'crypto';
+import fs from 'fs-extra';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import { log } from "./logger";
-import { ManifestVariables, PackagingOptions, ProgramOptions } from "./types";
-import { getCertPublisher } from './msix';
-import { isValidVersion, WindowsOSVersion } from './win-version';
-import { manifest } from './manifestation';
+import { log } from "./logger.mjs";
+import { manifest } from './manifestation.mjs';
+import { getCertPublisher } from './bin.mjs';
+import { type ManifestVariables, type PackagingOptions, type ProgramOptions, type WindowsSignOptions } from "./types.mjs";
+import { isValidVersion, WindowsOSVersion } from './win-version.mjs';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const DEFAULT_WIN_KIT_VERSION = '10.0.26100.0';
 const MIN_ARM_WIN_KIT_VERSION = '10.0.22621.0';
 const WIN_KIT_BIN_PATH = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin';
@@ -66,6 +69,9 @@ export const ensureFolders = async (options: PackagingOptions) => {
 export const verifyOptions = async (options: PackagingOptions, manifestVars?: ManifestVariables) => {
   const { manifestIsSparsePackage, manifestPublisher } = manifestVars || {};
   const publisher = manifestPublisher || ensurePublisherPrefix(options.manifestVariables?.publisher);
+  const windowsSignOptions = options.windowsSignOptions;
+  const sign = options.sign !== undefined ? options.sign : true;
+
   let hasManifestParams = false;
   log.debug('You are calling with following packaging options', options)
   if(!options.appManifest && options.manifestVariables) {
@@ -90,14 +96,19 @@ export const verifyOptions = async (options: PackagingOptions, manifestVars?: Ma
   if(!(await fs.exists(options.appDir)) && !manifestIsSparsePackage) log.error('Path to application <appDir> does not exist.', true, { appDir: options.appDir });
   if(!options.packageAssets) log.warn('Path to packages assets <packageAssets> not provided, using default assets.');
   if(options.packageAssets && !(await fs.exists(options.packageAssets))) log.error('Path to packages assets provided but <packageAssets> does not exist.', true, { packageAssets: options.packageAssets });
-  if(!options.cert && options.cert_pass) log.warn('Path to cert <cert> not provided. A dev cert will be created with the provided password and the package will be signed with it!');
-  if(!options.cert && !options.cert_pass) log.warn('Path to cert <cert> and cert password <cert_pass> not provided. A dev cert will be created and the package will be signed with it!');
-  if(options.cert && !!options.signParams) log.warn('Path to cert <cert> and custom signParams provided. signParams will take priority!');
-  if(options.cert && !(await fs.exists(options.cert))) log.error('Path to cert <cert> does not exist.', true, { cert: options.cert });
-  if(options.cert && !options.cert_pass) log.warn('Cert cert password <cert_pass> not provided.');
-  if(options.cert && options.cert_pass) {
-    const certPublisher = await getCertPublisher(options.cert, options.cert_pass);
-    if(publisher != certPublisher) log.error('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: publisher, cert_publisher: certPublisher});
+  if(sign) {
+    if(!windowsSignOptions || (!windowsSignOptions['appDirectory'] && (!windowsSignOptions['files'] || windowsSignOptions['files'].length === 0))) {
+      log.warn('Neither path to application <appDir> nor files <files> provided in windows sign options. Will add MSIX package to files.');
+    }
+
+    if(!windowsSignOptions?.certificateFile && windowsSignOptions?.certificatePassword) log.warn('Path to cert <cert> not provided. A dev cert will be created with the provided password and the package will be signed with it!');
+    if(!windowsSignOptions?.certificateFile && !windowsSignOptions?.certificatePassword) log.warn('Path to cert <certificateFile> and cert password <certificatePassword> not provided. A dev cert will be created with a random password and the package will be signed with it!');
+    if(windowsSignOptions?.certificateFile && !(await fs.exists(windowsSignOptions?.certificateFile))) log.error('Path to cert <certificateFile> does not exist.', true, { certificateFile: windowsSignOptions?.certificateFile });
+    if(windowsSignOptions?.certificateFile && !windowsSignOptions?.certificatePassword) log.warn('Cert password <certificatePassword> not provided.');
+    if(windowsSignOptions?.certificateFile && windowsSignOptions?.certificatePassword) {
+      const certPublisher = await getCertPublisher(windowsSignOptions?.certificateFile, windowsSignOptions?.certificatePassword);
+      if(publisher != certPublisher) log.error('The publisher in the manifest must match the publisher of the cert', false, {manifest_publisher: publisher, cert_publisher: certPublisher});
+    }
   }
 }
 
@@ -198,7 +209,7 @@ function generatePassword() {
   return password;
 }
 
-export const makeProgramOptions = async (options: PackagingOptions, manifestVars?: ManifestVariables) => {
+export const makeProgramOptions = async (options: PackagingOptions, manifestVars?: ManifestVariables) =>{
   const { makeAppx, makePri, signTool, makeCert} = await locateMSIXTooling(options, manifestVars);
   const { outputDir, layoutDir } = await ensureFolders(options);
   const { manifestAppName, manifestPackageArch, manifestIsSparsePackage, manifestPublisher } = manifestVars || {};
@@ -215,35 +226,31 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
   const createPri = options.createPri !== undefined ? options.createPri : true;
   const publisher = options.manifestVariables?.publisher || manifestPublisher || '';
   const sign = options.sign !== undefined ? options.sign : true;
-  let cert_pfx = options.cert || '';
-  let cert_cer = "";
-  let cert_pass = options.cert_pass;
-  const createDevCert = !options.cert && sign;
-  let signParams: Array<string> = [];
+  let windowsSignOptions: WindowsSignOptions
+  let cert_pfx = windowsSignOptions?.certificateFile || '';
+  let cert_cer = '';
+  let cert_pass = '';
+  const createDevCert = !options.windowsSignOptions?.certificateFile && sign;
   if(sign) {
+    windowsSignOptions = options.windowsSignOptions || {files: [msix], certificateFile: '', certificatePassword: '', hashes: ["sha256"] as any };
+    cert_pass = windowsSignOptions?.certificatePassword || generatePassword();
+    if (!windowsSignOptions.hashes || windowsSignOptions.hashes.length === 0) {
+      windowsSignOptions.hashes = ['sha256'] as any;
+    }
     if(createDevCert) {
       cert_pfx = path.join(outputDir, 'dev_cert.pfx');
       cert_cer = path.join(outputDir, 'dev_cert.cer');
-      if(!cert_pass) {
-        cert_pass = generatePassword();
-      }
+      windowsSignOptions[`certificateFile`] = cert_pfx;
+      windowsSignOptions[`certificatePassword`] = cert_pass;
     }
-
-    if(options.signParams && options.signParams.length > 0) {
-      signParams = options.signParams;
-    } else {
-      signParams = [
-        '-fd',
-        'sha256',
-        '-f',
-        cert_pfx,
-        '-p',
-        cert_pass
-      ];
-    }
-
     if(options.logLevel === 'debug') {
-      signParams.push('-debug');
+      windowsSignOptions[`debug`] = true;
+    }
+
+    const hasAppDirectorySet = 'appDirectory' in windowsSignOptions && windowsSignOptions.appDirectory;
+    const hasFilesSet = 'files' in windowsSignOptions && windowsSignOptions.files && windowsSignOptions.files.length > 0;
+    if(!hasAppDirectorySet && !hasFilesSet) {
+      windowsSignOptions[`files`] = [msix];
     }
   }
 
@@ -270,8 +277,8 @@ export const makeProgramOptions = async (options: PackagingOptions, manifestVars
     priFile,
     createPri,
     isSparsePackage,
-    signParams,
     sign,
+    windowsSignOptions,
     createDevCert,
     publisher,
   }

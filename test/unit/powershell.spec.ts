@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { powershell } from "../../src/powershell";
+import { powershell } from "../../src/powershell.mts";
 import { spawn } from "@malept/cross-spawn-promise";
 
 vi.mock(import("@malept/cross-spawn-promise"), async () => {

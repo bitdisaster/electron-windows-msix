@@ -1,7 +1,8 @@
 import * as fs from 'fs';
-import { describe, it, expect, beforeAll } from "vitest";
 import path from "path";
-import { packageMSIX } from "../../src";
+import { describe, it, expect, beforeAll } from "vitest";
+
+import { packageMSIX } from "../../src/index.mjs";
 import { getCertStatus, getCertSubject, installDevCert } from './utils/cert';
 
 describe('signing', () => {
@@ -15,8 +16,10 @@ describe('signing', () => {
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),
         outputDir: path.join(__dirname, '..', '..', 'out'),
         appManifest: path.join(__dirname, 'fixtures', 'AppxManifest_x64.xml'),
-        cert: path.join(__dirname, 'fixtures', 'MSIXDevCert.pfx'),
-        cert_pass: 'Password123',
+        windowsSignOptions: {
+          certificateFile: path.join(__dirname, 'fixtures', 'MSIXDevCert.pfx'),
+          certificatePassword: 'Password123',
+        },
       });
       expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
     });
@@ -36,8 +39,10 @@ describe('signing', () => {
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),
         outputDir: path.join(__dirname, '..', '..', 'out'),
         appManifest: path.join(__dirname, 'fixtures', 'AppxManifest_x64.xml'),
-        cert: path.join(__dirname, 'fixtures', 'MSIXDevCert.pfx'),
-        cert_pass: 'Password123',
+        windowsSignOptions: {
+          certificateFile: path.join(__dirname, 'fixtures', 'MSIXDevCert.pfx'),
+          certificatePassword: 'Password123',
+        },
         sign: false,
       });
       expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
@@ -50,14 +55,13 @@ describe('signing', () => {
         appDir: path.join(__dirname, 'fixtures', 'app-x64'),
         outputDir: path.join(__dirname, '..', '..', 'out'),
         appManifest: path.join(__dirname, 'fixtures', 'AppxManifest_x64.xml'),
-        signParams:  [
-          '-fd',
-          'sha256',
-          '-f',
-          path.join(__dirname, 'fixtures', 'MSIXDevCert.pfx'),
-          '-p',
-          'Password123'
-        ],
+        windowsSignOptions: {
+          certificateFile: path.join(__dirname, 'fixtures', 'MSIXDevCert.pfx'),
+          certificatePassword: 'Password123',
+          signWithParams: [
+            '/v',
+          ],
+        },
       });
       expect(fs.existsSync(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'))).toBe(true);
       const certStatus = await getCertStatus(path.join(__dirname, '..', '..', 'out', 'hellomsix_x64.msix'));

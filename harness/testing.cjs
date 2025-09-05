@@ -1,6 +1,6 @@
 const path = require('path');
 
-const { packageMSIX } = require("../lib/index");
+const { packageMSIX } = require("../lib/index.mjs");
 
 // packageMSIX({
 //   appDir:  path.join(__dirname, '..\\test\\fixtures\\app-x64'),
@@ -47,14 +47,14 @@ const main = async () => {
   const artifacts = await packageMSIX({
     appDir:  path.join(__dirname, '\\..\\test\\e2e\\fixtures\\app-x64'),
     manifestVariables: {
-      publisher: 'Jan Hannemann',
+      publisher: 'Electron MSIX',
       packageIdentity: 'com.electron.myapp',
       packageVersion: '1.42.0',
       appExecutable: 'HelloMSIX.exe',
       targetArch: 'x64',
-      packageMinOSVersion: '10.0.19041.0',
     },
-    outputDir: path.join(__dirname, '..\\..\\out'),
+    outputDir: path.join(__dirname, '..\\out'),
+    logLevel: 'debug',
   });
 
   console.log(artifacts);

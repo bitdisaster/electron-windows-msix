@@ -1,3 +1,22 @@
+import type { SignOptions } from "@electron/windows-sign";
+
+/**
+ * Modified SignOptions to make files and appDirectory optional. We can inject the MSIX package to the files array or the appDirectory if not provided.
+
+ */
+export type WindowsSignOptions = Omit<SignOptions, 'files' | 'appDirectory'> & {
+  /**
+   * Path to the application directory. We will scan this
+   * directory for any `.dll`, `.exe`, `.msi`, or `.node` files and
+   * codesign them with `signtool.exe`.
+   */
+  appDirectory?: string;
+  /**
+   * Array of paths to files to be codesigned with `signtool.exe`.
+   */
+  files?: Array<string>;
+};
+
 export interface ManifestGenerationVariables {
   /**
   * The identity of the MSIX package. This will be used to set the Identity attribute in the AppxManifest.xml.
@@ -61,8 +80,6 @@ export interface ManifestGenerationVariables {
   packageMaxOSVersionTested ? : string;
 }
 
-
-
 export interface PackagingOptions {
   /**
    * The manifest variables to generate the AppxManifest.xml for the package.
@@ -100,18 +117,9 @@ export interface PackagingOptions {
    */
   sign ? : boolean;
   /**
-   * An optional path to the certificate. If not provided then the MSIX will not be signed. Beware that the Publisher of the cert
-   * must match the AppxManifest Publisher.
+   * Optional options for @electron/windows-sign. If present it will supersede signParams parameter.
    */
-  cert ? : string;
-  /**
-   * The password for the cert.
-   */
-  cert_pass ? : string;
-  /**
-   * A custom set of SignTool parameters. If present it will supersede cert and cert_pass parameters.
-   */
-  signParams ? : Array < string >
+  windowsSignOptions ? : WindowsSignOptions;
   /**
    * Controls the level of logging
    */
@@ -139,8 +147,8 @@ export interface ProgramOptions {
   priConfig: string;
   priFile: string;
   isSparsePackage: boolean;
-  signParams: Array<string>;
   sign: boolean;
+  windowsSignOptions: WindowsSignOptions;
   createDevCert: boolean;
   publisher: string;
 }

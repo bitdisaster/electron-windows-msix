@@ -1,14 +1,14 @@
 import * as path from 'path'
 
 import { expect, describe, it, vi } from 'vitest'
-import { makeProgramOptions } from '../../src/utils';
-import { ManifestGenerationVariables, ManifestVariables, PackagingOptions } from '../../src/types';
-import { getManifestVariables, manifest } from '../../src/manifestation';
+import { makeProgramOptions } from '../../src/utils.mjs';
+import { ManifestGenerationVariables, ManifestVariables, PackagingOptions } from '../../src/types.mjs';
+import { getManifestVariables, manifest } from '../../src/manifestation.mjs';
 
 vi.mock('fs-extra', async (importOriginal) => {
   const actual = await importOriginal() as Record < string,
     any > ;
-  return {
+  return { default:  {
     exists: vi.fn().mockReturnValue(true),
     emptyDir: vi.fn(),
     ensureDir: vi.fn(),
@@ -17,7 +17,7 @@ vi.mock('fs-extra', async (importOriginal) => {
     readFile: actual.readFile,
     writeFile: vi.fn(),
     copy: vi.fn(),
-  };
+  }};
 });
 
 const minimalManifestVariables: ManifestGenerationVariables = {

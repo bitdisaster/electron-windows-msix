@@ -1,8 +1,9 @@
 import * as fs from 'fs';
-import { describe, it, expect, beforeAll } from "vitest";
 import path from "path";
-import { packageMSIX } from "../../src";
-import { getCertStatus, installDevCert } from './utils/cert';
+import { describe, it, expect, beforeAll } from "vitest";
+
+import { packageMSIX } from "../../src/index.mjs";
+import { installDevCert } from './utils/cert';
 
 describe('packaging', () => {
   beforeAll(async () => {

@@ -20,22 +20,19 @@ npm install electron-windows-msix
 ```
   PACKAGING OPTIONS
 
-  appDir            - The folder containing the packaged Electron App
-  appManifest       - The AppManifest.xml containing necessary declarations to build the MSIX
-  manifestVariables - Optional manifest variables to generate a manifest if manifest file is not provided
-  packageAssets     - Required assets declared in AppManifest.xml. E.g. icons and tile images
-  outputDir         - The output directory for the finished MSIX package.
-  packageName       - Optional name for the finished MSIX package. If not provided a name will be derived from AppManifest.xml.
-  windowsKitVersion - Optional version of the WindowsKit to use. If WindowsKitPath is provide then it will trump this. If neither WindowsKitVersion nor
+  appDir             - The folder containing the packaged Electron App
+  appManifest        - The AppManifest.xml containing necessary declarations to build the MSIX
+  manifestVariables  - Optional manifest variables to generate a manifest if manifest file is not provided
+  packageAssets      - Required assets declared in AppManifest.xml. E.g. icons and tile images
+  outputDir          - The output directory for the finished MSIX package.
+  packageName        - Optional name for the finished MSIX package. If not provided a name will be derived from AppManifest.xml.
+  windowsKitVersion  - Optional version of the WindowsKit to use. If WindowsKitPath is provide then it will trump this. If neither WindowsKitVersion nor
                       WindowsKitPath is provided then the Windows Kit path will be derived from the S Version specified in AppManifest.xml.
-  windowsKitPath    - An optional full path to the WindowsKit. This path will trump both WindowsKitVersion and AppxManifest.
-  createPri         - Indicates whether to create Pri resource files. It is enabled by default.
-  cert              - An optional path to the certificate. If not provided then the MSIX will not be signed. Beware that the Publisher of the cert
-                      must match the AppxManifest Publisher.
-  cert_pass         - Optionally the password for the cert.
-  signParams        - Optionally an explicit set parameter for the SignTool. If present it will supersede the cert an cert_pass parameter.
-  sign              - Optional parameter that indicates whether the MSIX should be signed. True by default.
-  logLevel          - Optional log level. By default the module will be silent. The 'warn' level will give heads up on irregularities.
+  windowsKitPath     - An optional full path to the WindowsKit. This path will trump both WindowsKitVersion and AppxManifest.
+  createPri          - Indicates whether to create Pri resource files. It is enabled by default.
+  sign               - Optional parameter that indicates whether the MSIX should be signed. True by default.
+  windowsSignOptions - Optional parameter for `@electron/windows-sign`, missing will be filled in. See https://github.com/electron/windows-sign for details
+  logLevel           - Optional log level. By default the module will be silent. The 'warn' level will give heads up on irregularities.
                       The 'debug' level will give extensive output to identify problems with the module.
 ```
 
@@ -82,8 +79,10 @@ await packageMSIX({
   appManifest: 'C:\\temp\\AppxManifest.xml',
   packageAssets: 'C:\\temp\\assets',
   outputDir: 'C:\\temp\\out',
-  cert: 'C:\\temp\\app_cert.pfx',
-  cert_pass: 'hellomsix',
+  windowsSignOptions: {
+    certificateFile: 'C:\\temp\\app_cert.pfx',
+    certificatePassword: 'hellomsix',
+  }
 });
 ```
 
@@ -109,10 +108,12 @@ await packageMSIX({
     packageMinOSVersion: '10.0.19041.0',
     packageMaxOSVersionTested: '10.0.19041.0',
   },
+  windowsSignOptions: {
+    certificateFile: 'C:\\temp\\app_cert.pfx',
+    certificatePassword: 'hellomsix',
+  },
   windowsKitPath: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\19041\\x64',
   createPri: true,
-  cert: 'C:\\temp\\app_cert.pfx',
-  cert_pass: 'hellomsix',
   packageName: 'MyApp.msix',
   logLevel: 'warn',
   sign: true
@@ -130,11 +131,13 @@ await packageMSIX({
   outputDir: 'C:\\temp\\out',
   windowsKitPath: 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x64',
   createPri: true,
-  cert: 'C:\\temp\\app_cert.pfx',
-  cert_pass: 'hellomsix',
   packageName: 'MyApp.msix',
   logLevel: 'warn',
   sign: true
+  windowsSignOptions: {
+    certificateFile: 'C:\\temp\\app_cert.pfx',
+    certificatePassword: 'hellomsix',
+  }
 });
 ```
 

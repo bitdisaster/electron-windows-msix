@@ -133,7 +133,7 @@ await packageMSIX({
   createPri: true,
   packageName: 'MyApp.msix',
   logLevel: 'warn',
-  sign: true
+  sign: true,
   windowsSignOptions: {
     certificateFile: 'C:\\temp\\app_cert.pfx',
     certificatePassword: 'hellomsix',
